@@ -91,9 +91,9 @@ const defaultTeachingDir = "/Users/ken/Documents/GO/Games/teaching/"
 var TeachingDir = defaultTeachingDir
 const defaultTeachingPatternsDir = "/Users/ken/Documents/GO/Games/teaching/patterns/"
 var TeachingPatternsDir = defaultTeachingPatternsDir
-const defaultFusekiFileName = "/Users/ken/ahgo/Fuseki.sgf"
+const defaultFusekiFileName = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/Fuseki.sgf"
 var fusekiFileName = defaultFusekiFileName
-const defaultOutFusekiFileName = "/Users/ken/ahgo/Fuseki2.sgf"
+const defaultOutFusekiFileName = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/Fuseki2.sgf"
 var outFusekiFileName = defaultOutFusekiFileName
 
 var fileLimit int = 0 // no fileLimit
