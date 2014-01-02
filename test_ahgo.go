@@ -44,8 +44,8 @@ import (
 
 const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with Go version 1.2 Generate whole board patterns...)"
 
-    // SGF Specification file is from a different project: Projects/GenSGFProperties
-const defaultSGFSpecFile = "/Users/ken/ahgo/src/sgf_properties_spec.txt"
+    // SGF Specification file is copied from a different project: Projects/GenSGFProperties
+const defaultSGFSpecFile = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
 var SGFSpecFile = defaultSGFSpecFile
 
     // Some DEBUG (print) controls:
