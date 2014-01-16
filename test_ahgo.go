@@ -44,29 +44,36 @@ import (
 
 const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with Go version 1.2 Generate whole board patterns...)"
 
-    // SGF Specification file is copied from a different project: Projects/GenSGFProperties
+const DO_MULTI_CPU  = true
+
+// SGF Specification file is copied from a different project: Projects/GenSGFProperties
 const defaultSGFSpecFile = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
 var SGFSpecFile = defaultSGFSpecFile
 
-    // Some DEBUG (print) controls:
-var doAllTests = false
+// Some test and print controls.
+// default values are controlled by init()
+// final values are set by program arguments
+//
+var doAllTests bool
 
-var doPrintSizes = false
-var doPrintConstants = false
-var doPrintHandicaps = false
-var doPrintDirections = false // requires doPrintConstants to be true
-var doPrintSGFProperties = false
-var doPrintZKeys = false
-var doVerifySGFPropertyOrder = false
-var doSmallSGFTests = false
-var doTransTest = false
-var doCountMoves = false
-var doReadWriteDatabase = false
-var doReadDatabaseAndBuild = false
-var doReadTeachingGames = false
-var doReadWriteFuseki = false
+var doPrintSizes bool
+var doPrintConstants bool
+var doPrintHandicaps bool
+var doPrintDirections bool // requires doPrintConstants to be true
+var doPrintSGFProperties bool
+var doPrintZKeys bool
+var doVerifySGFPropertyOrder bool
+var doSmallSGFTests bool
+var doTransTest bool
+var doCountMoves bool
+var doReadWriteDatabase bool
+var doReadDatabaseAndBuild bool
+var doReadTeachingGames bool
+var doReadWriteFuseki bool
 
-    // count should be 56 with all tests included. One test currently in "WorkOnLater"
+// count should be 56 with all tests included. 
+// One test currently in "WorkOnLater"
+//
 const SmallSGFTestOutputVerified int = 54  // controls the printing of last graph
 const SmallSGFTestStringsVerified int = 55 // controls tracing
 
@@ -751,16 +758,20 @@ func checkHandicapCanonical() {
 		t := ah.BoardTrans(i)
 		inv := ah.InverseTrans[t]
 		fmt.Println("Checking", ah.TransName[i], "and its inverse:", ah.TransName[inv])
-		newBrd := brd.TransBoard(t)
-		newBrdInv := newBrd.TransBoard(inv)
-		if differBrds(brd, newBrdInv) {
-			printBrds("Error: inverse differs", brd, newBrdInv, ah.TransName[i])
-		}
+        if (brd != nil) {
+            newBrd := brd.TransBoard(t)
+            newBrdInv := newBrd.TransBoard(inv)
+            if differBrds(brd, newBrdInv) {
+                printBrds("Error: inverse differs", brd, newBrdInv, ah.TransName[i])
+            }
+        } else {
+            fmt.Println("Error: brds [", i, "] has not been initialized.")
+        }
 	}
 
 }
 
-// printCannonicalHandicap points
+// printCannonicalHandicap points]
 //
 func printCannonicalHandicap() {
 	for ha := 0; ha <= 9; ha++ {
@@ -1094,8 +1105,6 @@ func PrintOptionsSet() {
     }
 }
 
-const DO_MULTI_CPU  = false
-
 func main() {
     fmt.Printf("Program to generate opening pattern libraries:\n Version %s\n", SGF_GEN_GO_VERSION)
     nCPUs := runtime.NumCPU()
@@ -1129,10 +1138,6 @@ func main() {
 		printConst()
 	}
 
-	if doAllTests || doPrintHandicaps {
-		printCannonicalHandicap()
-	}
-
 	if sgf.Setup(SGFSpecFile, doAllTests || doVerifySGFPropertyOrder, doAllTests || doPrintSGFProperties) == 0 {
 
 		if doAllTests || doSmallSGFTests {
@@ -1145,6 +1150,10 @@ func main() {
 			printBoard()
 		}
 
+        if doAllTests || doPrintHandicaps {
+            printCannonicalHandicap()
+        }
+        
 		if doAllTests || doCountMoves {
 			ah.SetAHTrace(false)
 			sgfdb.CountFilesAndMoves(DatabaseDir, fileLimit)
