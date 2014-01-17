@@ -7,7 +7,7 @@
  *	All rights reserved.
  *
  *	Test the ah, sgf, and sgfdb packages.
- *	
+ *
  *	To build and run:
  *      see the buildScript.bash
  *
@@ -33,21 +33,22 @@ import (
 	"strings"
 	"time"
 	//	"sort"
-    "runtime"
+	"fmt"
 	"gitHub.com/Ken1JF/ahgo/ah"
 	"gitHub.com/Ken1JF/ahgo/sgf"
 	"gitHub.com/Ken1JF/ahgo/sgfdb"
-	"fmt"
+	"runtime"
 
-//	"unsafe"
+	//	"unsafe"
 )
 
 const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with Go version 1.2 Generate whole board patterns...)"
 
-const DO_MULTI_CPU  = true
+const DO_MULTI_CPU = true
 
 // SGF Specification file is copied from a different project: Projects/GenSGFProperties
 const defaultSGFSpecFile = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
+
 var SGFSpecFile = defaultSGFSpecFile
 
 // Some test and print controls.
@@ -71,50 +72,63 @@ var doReadDatabaseAndBuild bool
 var doReadTeachingGames bool
 var doReadWriteFuseki bool
 
-// count should be 56 with all tests included. 
+// count should be 56 with all tests included.
 // One test currently in "WorkOnLater"
 //
 const SmallSGFTestOutputVerified int = 54  // controls the printing of last graph
 const SmallSGFTestStringsVerified int = 55 // controls tracing
 
 const defaultSmallSGFTestDir = "/Users/ken/Documents/GO/Tests/sgf_tests/"
+
 var SmallSGFTestDir = defaultSmallSGFTestDir
 
-    // Set to empty string to suppress writing output:
+// Set to empty string to suppress writing output:
 const defaultSmallSGFTestOutDir = "/Users/ken/Documents/GO/Tests/sgf_tests/goTestOut/"
-var SmallSGFTestOutDir = defaultSmallSGFTestOutDir
 
+var SmallSGFTestOutDir = defaultSmallSGFTestOutDir
 
 // Test Controls:
 
 // SGF Database and testout dirs:
 const defaultDatabaseDir = "/Users/ken/Documents/GO/GoGoD/Go/Database/"
+
 var DatabaseDir = defaultDatabaseDir
+
 const defaultTestOutDir = "/Users/ken/Documents/GO/GoGoD/testout/"
+
 var TestOutDir = defaultTestOutDir
+
 const defaultBoardPatternsDir = "/Users/ken/Projects/OpenLikeAPro/Library/Board/"
+
 var BoardPatternsDir = defaultBoardPatternsDir
+
 const defaultTeachingDir = "/Users/ken/Documents/GO/Games/teaching/"
+
 var TeachingDir = defaultTeachingDir
+
 const defaultTeachingPatternsDir = "/Users/ken/Documents/GO/Games/teaching/patterns/"
+
 var TeachingPatternsDir = defaultTeachingPatternsDir
+
 const defaultFusekiFileName = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/Fuseki.sgf"
+
 var fusekiFileName = defaultFusekiFileName
+
 const defaultOutFusekiFileName = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/Fuseki2.sgf"
+
 var outFusekiFileName = defaultOutFusekiFileName
 
 var fileLimit int = 0 // no fileLimit
 var moveLimit = 0     // no moveLimit
 var patternLimit = 0  // no patternLimit
-var skipFiles = 0   // no skipping
+var skipFiles = 0     // no skipping
 
-type ProcessOptions  uint8
+type ProcessOptions uint8
 
 const (
-       RemoveLabels    ProcessOptions  = 1 << iota
-       AddAllLabels    
-       )
-
+	RemoveLabels ProcessOptions = 1 << iota
+	AddAllLabels
+)
 
 var sgfProcessOptions ProcessOptions = 0
 
@@ -122,7 +136,7 @@ var removeLabels = false
 var allLabels = false
 
 func ReadSmallSGFTests(dir string, outDir string) {
-    fmt.Println("Reading Small SGF Tests, dir = ", dir,", outDir = ", outDir);
+	fmt.Println("Reading Small SGF Tests, dir = ", dir, ", outDir = ", outDir)
 	dirFiles, err := ioutil.ReadDir(dir)
 	if err != nil && err != io.EOF {
 		fmt.Println("Can't read test directory: ", dir)
@@ -292,8 +306,8 @@ var test_19 = []string{
 //
 func printInitBoard(abhr *ah.AbstHier, title string) {
 
-	//	Black_Occ_Pt:		"◉",	
-	//	White_Occ_Pt:		"◎",	
+	//	Black_Occ_Pt:		"◉",
+	//	White_Occ_Pt:		"◎",
 
 	var c ah.ColValue
 	var r ah.RowValue
@@ -758,15 +772,15 @@ func checkHandicapCanonical() {
 		t := ah.BoardTrans(i)
 		inv := ah.InverseTrans[t]
 		fmt.Println("Checking", ah.TransName[i], "and its inverse:", ah.TransName[inv])
-        if (brd != nil) {
-            newBrd := brd.TransBoard(t)
-            newBrdInv := newBrd.TransBoard(inv)
-            if differBrds(brd, newBrdInv) {
-                printBrds("Error: inverse differs", brd, newBrdInv, ah.TransName[i])
-            }
-        } else {
-            fmt.Println("Error: brds [", i, "] has not been initialized.")
-        }
+		if brd != nil {
+			newBrd := brd.TransBoard(t)
+			newBrdInv := newBrd.TransBoard(inv)
+			if differBrds(brd, newBrdInv) {
+				printBrds("Error: inverse differs", brd, newBrdInv, ah.TransName[i])
+			}
+		} else {
+			fmt.Println("Error: brds [", i, "] has not been initialized.")
+		}
 	}
 
 }
@@ -806,7 +820,7 @@ func printCannonicalHandicap() {
 			fmt.Println()
 		}
 	}
-    checkHandicapCanonical()
+	checkHandicapCanonical()
 }
 
 // test EachNode and EachAdjNode
@@ -971,165 +985,165 @@ func ReportSGFCounts() {
 }
 
 func init() {
-    
+
 	flag.IntVar(&moveLimit, "ml", 0, "ml = move limit. limit the number of moves read each .sgf file, 0 means no limit")
 	flag.IntVar(&fileLimit, "fl", 0, "fl = file limit. limit the number of .sgf files read from a directory, 0 means no limit")
 	flag.IntVar(&patternLimit, "pl", 0, "pl = pattern limit. limit the depth of pattern storing, 0 means no limit")
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
-    flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
-    flag.BoolVar(&doPrintSizes, "ps", false, "ps = print sizes. print the sizes of data types, false (default) means not to print sizes.")
-    flag.BoolVar(&doPrintConstants, "pc", false, "pc = print constants. print the values of constants, false (default) means not to print constants.")
-    flag.BoolVar(&doPrintDirections, "pd", false, "pd = print directions. print the values of directions, false (default) means not to print directions.")
-    flag.BoolVar(&doPrintHandicaps, "ph", false, "ph = print handicaps. print the canonical placement of handicaps, false (default) means not to print handicaps.")
-    flag.BoolVar(&doPrintSGFProperties, "pp", false, "pp = print SGF properties. print the SGF porperties, false (default) means not to print SGF properties.")
-    flag.BoolVar(&doPrintZKeys, "pzk", false, "pzk = print Z Keys. print the Zobrist Keys, false (default) means not to the Z Keys.")
-    flag.BoolVar(&doVerifySGFPropertyOrder, "vpo", false, "vpo = verify SGF property order, after reading SGF_Properties_Spec.txt file, false (default) means do not verify.")
-    flag.BoolVar(&doSmallSGFTests, "sst", false, "sst = do Small SGF Tests, false (default) means do not do these tests.")
-    flag.BoolVar(&doTransTest, "tt", false, "tt = do Trans Test, false (default) means do not do Trans test.")
-    flag.BoolVar(&doCountMoves, "cm", false, "cm = do Count Moves, false (default) means do not do count moves.")
-    flag.BoolVar(&doReadWriteDatabase, "rwd", false, "rwd = do Read and Write Database, false (default) means do not read and write database.")
-    flag.BoolVar(&doReadDatabaseAndBuild, "rdab", false, "rdab = do Read Database And Build patterns, false (default) means do not do Read Database And Build patterns.")
-    flag.BoolVar(&doReadTeachingGames, "rtg", false, "rtg = do Read Teaching Games, false (default) means do not do read teaching games.")
-    flag.BoolVar(&doReadWriteFuseki, "rwf", false, "rwf = do Read Write Fuseki, false (default) means do not read and write Fuseki file.")
-    flag.BoolVar(&removeLabels, "rl", false, "rl = remove labels, false (default) means do not remove labels from Fuseki file.")
-    flag.BoolVar(&allLabels, "al", false, "al = all labels, false (default) means do generate all labels in Fuseki file.")
-    
-    flag.StringVar(&SGFSpecFile, "ssf", defaultSGFSpecFile, "path to the SGF properties specification file.")
-    flag.StringVar(&SmallSGFTestDir, "sstdir", defaultSmallSGFTestDir, "path to the Small SGF test directory.")
-    flag.StringVar(&SmallSGFTestOutDir, "sstodir", defaultSmallSGFTestOutDir, "path to the Small SGF Tests output directory.")
-    flag.StringVar(&DatabaseDir, "dbdir", defaultDatabaseDir, "path to the Database directory.")
-    flag.StringVar(&TestOutDir, "todir", defaultTestOutDir, "path to the test output directory.")
-    flag.StringVar(&BoardPatternsDir, "bpdir", defaultBoardPatternsDir, "path to the Board Patterns directory.")
-    flag.StringVar(&TeachingDir, "tdir", defaultTeachingDir, "path to teaching games directory.")
-    flag.StringVar(&TeachingPatternsDir, "tpdir", defaultTeachingPatternsDir, "path to the teaching patterns directory.")
- 
-    flag.StringVar(&fusekiFileName, "ffn", defaultFusekiFileName, "path to the Fuseki file.")
-    flag.StringVar(&outFusekiFileName, "offn", defaultOutFusekiFileName, "path to the output Fuseki file.")
+	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
+	flag.BoolVar(&doPrintSizes, "ps", false, "ps = print sizes. print the sizes of data types, false (default) means not to print sizes.")
+	flag.BoolVar(&doPrintConstants, "pc", false, "pc = print constants. print the values of constants, false (default) means not to print constants.")
+	flag.BoolVar(&doPrintDirections, "pd", false, "pd = print directions. print the values of directions, false (default) means not to print directions.")
+	flag.BoolVar(&doPrintHandicaps, "ph", false, "ph = print handicaps. print the canonical placement of handicaps, false (default) means not to print handicaps.")
+	flag.BoolVar(&doPrintSGFProperties, "pp", false, "pp = print SGF properties. print the SGF porperties, false (default) means not to print SGF properties.")
+	flag.BoolVar(&doPrintZKeys, "pzk", false, "pzk = print Z Keys. print the Zobrist Keys, false (default) means not to the Z Keys.")
+	flag.BoolVar(&doVerifySGFPropertyOrder, "vpo", false, "vpo = verify SGF property order, after reading SGF_Properties_Spec.txt file, false (default) means do not verify.")
+	flag.BoolVar(&doSmallSGFTests, "sst", false, "sst = do Small SGF Tests, false (default) means do not do these tests.")
+	flag.BoolVar(&doTransTest, "tt", false, "tt = do Trans Test, false (default) means do not do Trans test.")
+	flag.BoolVar(&doCountMoves, "cm", false, "cm = do Count Moves, false (default) means do not do count moves.")
+	flag.BoolVar(&doReadWriteDatabase, "rwd", false, "rwd = do Read and Write Database, false (default) means do not read and write database.")
+	flag.BoolVar(&doReadDatabaseAndBuild, "rdab", false, "rdab = do Read Database And Build patterns, false (default) means do not do Read Database And Build patterns.")
+	flag.BoolVar(&doReadTeachingGames, "rtg", false, "rtg = do Read Teaching Games, false (default) means do not do read teaching games.")
+	flag.BoolVar(&doReadWriteFuseki, "rwf", false, "rwf = do Read Write Fuseki, false (default) means do not read and write Fuseki file.")
+	flag.BoolVar(&removeLabels, "rl", false, "rl = remove labels, false (default) means do not remove labels from Fuseki file.")
+	flag.BoolVar(&allLabels, "al", false, "al = all labels, false (default) means do generate all labels in Fuseki file.")
+
+	flag.StringVar(&SGFSpecFile, "ssf", defaultSGFSpecFile, "path to the SGF properties specification file.")
+	flag.StringVar(&SmallSGFTestDir, "sstdir", defaultSmallSGFTestDir, "path to the Small SGF test directory.")
+	flag.StringVar(&SmallSGFTestOutDir, "sstodir", defaultSmallSGFTestOutDir, "path to the Small SGF Tests output directory.")
+	flag.StringVar(&DatabaseDir, "dbdir", defaultDatabaseDir, "path to the Database directory.")
+	flag.StringVar(&TestOutDir, "todir", defaultTestOutDir, "path to the test output directory.")
+	flag.StringVar(&BoardPatternsDir, "bpdir", defaultBoardPatternsDir, "path to the Board Patterns directory.")
+	flag.StringVar(&TeachingDir, "tdir", defaultTeachingDir, "path to teaching games directory.")
+	flag.StringVar(&TeachingPatternsDir, "tpdir", defaultTeachingPatternsDir, "path to the teaching patterns directory.")
+
+	flag.StringVar(&fusekiFileName, "ffn", defaultFusekiFileName, "path to the Fuseki file.")
+	flag.StringVar(&outFusekiFileName, "offn", defaultOutFusekiFileName, "path to the output Fuseki file.")
 }
 
 func PrintOptionsSet() {
-        // Print changes to the options:
-    if allLabels {
-        fmt.Printf("al, all labels has value %v\n", allLabels)
-    }
-    if doAllTests {
-        fmt.Printf("at, all test has value %t\n", doAllTests)
-    }
-    if BoardPatternsDir != defaultBoardPatternsDir {
-        fmt.Printf("bpdir, board patterns directory has value \"%s\"\n", BoardPatternsDir);
-    }
-    if doCountMoves {
-        fmt.Printf("cm, do count moves has value %t\n", doCountMoves)
-    }
-    if DatabaseDir != defaultDatabaseDir {
-        fmt.Printf("dbdir, data base directory has value \"%s\"\n", DatabaseDir);
-    }
-    if fusekiFileName != defaultFusekiFileName {
-        fmt.Printf("ffn, Fuseki file name has value \"%s\"\n", fusekiFileName);
-    }
-    if fileLimit != 0 {
-        fmt.Printf("fl, file limit has value %d\n", fileLimit)
-    }
-    if moveLimit != 0 {
-        fmt.Printf("ml, move limit has value %d\n", moveLimit)
-    }
-    if outFusekiFileName != defaultOutFusekiFileName {
-        fmt.Printf("offn, output Fuseki file name has value \"%s\"\n", outFusekiFileName);
-    }
-    if doPrintConstants {
-        fmt.Printf("pc, print constants has value %t\n", doPrintConstants)
-    }
-    if doPrintDirections {
-        fmt.Printf("pd, print directions has value %t\n", doPrintDirections)
-    }
-    if doPrintHandicaps {
-        fmt.Printf("ph, print handicaps has value %t\n", doPrintHandicaps)
-    }
-    if patternLimit != 0 {
-        fmt.Printf("pl, pattern limit has value %d\n", patternLimit)
-    }
-    if doPrintSGFProperties {
-        fmt.Printf("pp, print SGF properties has value %t\n", doPrintSGFProperties)
-    }
-    if doPrintSizes {
-        fmt.Printf("ps, print sizes has value %t\n", doPrintSizes)
-    }
-    if doPrintZKeys {
-        fmt.Printf("pzk, print the Z Keys has value %t\n", doPrintZKeys)
-    }
-    if doReadDatabaseAndBuild {
-        fmt.Printf("rdab, do read database and build has value %t\n", doReadDatabaseAndBuild)
-    }
-    if removeLabels {
-        fmt.Printf("rl, removeLabels has value %t\n", removeLabels)
-    }
-    if doReadTeachingGames {
-        fmt.Printf("rtg, do read teaching games has value %t\n", doReadTeachingGames)
-    }
-    if doReadWriteDatabase {
-        fmt.Printf("rwd, do read write database has value %t\n", doReadWriteDatabase)
-    }
-    if doReadWriteFuseki {
-        fmt.Printf("rwf, do read write Fuseki file has value %t\n", doReadWriteFuseki)
-    }
-    if skipFiles != 0 {
-        fmt.Printf("sf, skip files has value %d\n", skipFiles)
-    }
-    if SGFSpecFile != defaultSGFSpecFile {
-        fmt.Printf("ssf, SGF specification file has value \"%s\"\n", SGFSpecFile);
-    }
-    if doSmallSGFTests {
-        fmt.Printf("sst, do small SGF tests has value %t\n", doSmallSGFTests)
-    }
-    if SmallSGFTestDir != defaultSmallSGFTestDir {
-        fmt.Printf("sstdir, small SGF test directory has value \"%s\"\n", SmallSGFTestDir);
-    }
-    if SmallSGFTestOutDir != defaultSmallSGFTestOutDir {
-        fmt.Printf("sstodir, small SGF test output directory has value \"%s\"\n", SmallSGFTestOutDir);
-    }
-    if TeachingDir != defaultTeachingDir {
-        fmt.Printf("tdir, teaching directory has value \"%s\"\n", TeachingDir);
-    }
-    if TestOutDir != defaultTestOutDir {
-        fmt.Printf("todir, test output directory has value \"%s\"\n", TestOutDir);
-    }
-    if TeachingPatternsDir != defaultTeachingPatternsDir {
-        fmt.Printf("tpdir, teaching patterns directory has value \"%s\"\n", TeachingPatternsDir);
-    }
-    if doTransTest {
-        fmt.Printf("tt, do trans test has value %t\n", doTransTest)
-    }
-    if doVerifySGFPropertyOrder {
-        fmt.Printf("vpo, verify SGF property order has value %t\n", doVerifySGFPropertyOrder)
-    }
+	// Print changes to the options:
+	if allLabels {
+		fmt.Printf("al, all labels has value %v\n", allLabels)
+	}
+	if doAllTests {
+		fmt.Printf("at, all test has value %t\n", doAllTests)
+	}
+	if BoardPatternsDir != defaultBoardPatternsDir {
+		fmt.Printf("bpdir, board patterns directory has value \"%s\"\n", BoardPatternsDir)
+	}
+	if doCountMoves {
+		fmt.Printf("cm, do count moves has value %t\n", doCountMoves)
+	}
+	if DatabaseDir != defaultDatabaseDir {
+		fmt.Printf("dbdir, data base directory has value \"%s\"\n", DatabaseDir)
+	}
+	if fusekiFileName != defaultFusekiFileName {
+		fmt.Printf("ffn, Fuseki file name has value \"%s\"\n", fusekiFileName)
+	}
+	if fileLimit != 0 {
+		fmt.Printf("fl, file limit has value %d\n", fileLimit)
+	}
+	if moveLimit != 0 {
+		fmt.Printf("ml, move limit has value %d\n", moveLimit)
+	}
+	if outFusekiFileName != defaultOutFusekiFileName {
+		fmt.Printf("offn, output Fuseki file name has value \"%s\"\n", outFusekiFileName)
+	}
+	if doPrintConstants {
+		fmt.Printf("pc, print constants has value %t\n", doPrintConstants)
+	}
+	if doPrintDirections {
+		fmt.Printf("pd, print directions has value %t\n", doPrintDirections)
+	}
+	if doPrintHandicaps {
+		fmt.Printf("ph, print handicaps has value %t\n", doPrintHandicaps)
+	}
+	if patternLimit != 0 {
+		fmt.Printf("pl, pattern limit has value %d\n", patternLimit)
+	}
+	if doPrintSGFProperties {
+		fmt.Printf("pp, print SGF properties has value %t\n", doPrintSGFProperties)
+	}
+	if doPrintSizes {
+		fmt.Printf("ps, print sizes has value %t\n", doPrintSizes)
+	}
+	if doPrintZKeys {
+		fmt.Printf("pzk, print the Z Keys has value %t\n", doPrintZKeys)
+	}
+	if doReadDatabaseAndBuild {
+		fmt.Printf("rdab, do read database and build has value %t\n", doReadDatabaseAndBuild)
+	}
+	if removeLabels {
+		fmt.Printf("rl, removeLabels has value %t\n", removeLabels)
+	}
+	if doReadTeachingGames {
+		fmt.Printf("rtg, do read teaching games has value %t\n", doReadTeachingGames)
+	}
+	if doReadWriteDatabase {
+		fmt.Printf("rwd, do read write database has value %t\n", doReadWriteDatabase)
+	}
+	if doReadWriteFuseki {
+		fmt.Printf("rwf, do read write Fuseki file has value %t\n", doReadWriteFuseki)
+	}
+	if skipFiles != 0 {
+		fmt.Printf("sf, skip files has value %d\n", skipFiles)
+	}
+	if SGFSpecFile != defaultSGFSpecFile {
+		fmt.Printf("ssf, SGF specification file has value \"%s\"\n", SGFSpecFile)
+	}
+	if doSmallSGFTests {
+		fmt.Printf("sst, do small SGF tests has value %t\n", doSmallSGFTests)
+	}
+	if SmallSGFTestDir != defaultSmallSGFTestDir {
+		fmt.Printf("sstdir, small SGF test directory has value \"%s\"\n", SmallSGFTestDir)
+	}
+	if SmallSGFTestOutDir != defaultSmallSGFTestOutDir {
+		fmt.Printf("sstodir, small SGF test output directory has value \"%s\"\n", SmallSGFTestOutDir)
+	}
+	if TeachingDir != defaultTeachingDir {
+		fmt.Printf("tdir, teaching directory has value \"%s\"\n", TeachingDir)
+	}
+	if TestOutDir != defaultTestOutDir {
+		fmt.Printf("todir, test output directory has value \"%s\"\n", TestOutDir)
+	}
+	if TeachingPatternsDir != defaultTeachingPatternsDir {
+		fmt.Printf("tpdir, teaching patterns directory has value \"%s\"\n", TeachingPatternsDir)
+	}
+	if doTransTest {
+		fmt.Printf("tt, do trans test has value %t\n", doTransTest)
+	}
+	if doVerifySGFPropertyOrder {
+		fmt.Printf("vpo, verify SGF property order has value %t\n", doVerifySGFPropertyOrder)
+	}
 }
 
 func main() {
-    fmt.Printf("Program to generate opening pattern libraries:\n Version %s\n", SGF_GEN_GO_VERSION)
-    nCPUs := runtime.NumCPU()
-    if DO_MULTI_CPU {
-        oldMaxProcs :=	runtime.GOMAXPROCS(nCPUs)
-        fmt.Printf(" num CPUs = %d, default max Procs was %d, now set to num CPUs\n\n", nCPUs, oldMaxProcs)
-    } else {
-        fmt.Printf(" num CPUs = %d, but multi-processing not enabled.\n\n", nCPUs)
-    }
+	fmt.Printf("Program to generate opening pattern libraries:\n Version %s\n", SGF_GEN_GO_VERSION)
+	nCPUs := runtime.NumCPU()
+	if DO_MULTI_CPU {
+		oldMaxProcs := runtime.GOMAXPROCS(nCPUs)
+		fmt.Printf(" num CPUs = %d, default max Procs was %d, now set to num CPUs\n\n", nCPUs, oldMaxProcs)
+	} else {
+		fmt.Printf(" num CPUs = %d, but multi-processing not enabled.\n\n", nCPUs)
+	}
 	start := time.Now()
-    
+
 	flag.Parse()
-    
+
 	flag.Usage()
-    
-        // Set the sgfProcessOptions based on Boolean Flags
-    if removeLabels {
-        sgfProcessOptions = sgfProcessOptions + RemoveLabels    
-    }
-    if allLabels {
-        sgfProcessOptions = sgfProcessOptions + AddAllLabels
-    }
-    
-    PrintOptionsSet()
-    
+
+	// Set the sgfProcessOptions based on Boolean Flags
+	if removeLabels {
+		sgfProcessOptions = sgfProcessOptions + RemoveLabels
+	}
+	if allLabels {
+		sgfProcessOptions = sgfProcessOptions + AddAllLabels
+	}
+
+	PrintOptionsSet()
+
 	if doAllTests || doPrintSizes {
 		PrintSizes()
 	}
@@ -1150,10 +1164,10 @@ func main() {
 			printBoard()
 		}
 
-        if doAllTests || doPrintHandicaps {
-            printCannonicalHandicap()
-        }
-        
+		if doAllTests || doPrintHandicaps {
+			printCannonicalHandicap()
+		}
+
 		if doAllTests || doCountMoves {
 			ah.SetAHTrace(false)
 			sgfdb.CountFilesAndMoves(DatabaseDir, fileLimit)
@@ -1161,7 +1175,7 @@ func main() {
 	}
 
 	setup_and_count := time.Now()
-    
+
 	fmt.Printf("Setup and CountFilesAndMoves took %v to run.\n", setup_and_count.Sub(start))
 
 	if doAllTests || doReadWriteDatabase {
@@ -1175,9 +1189,9 @@ func main() {
 	if doAllTests || doPrintZKeys {
 		ah.PrintZKeys()
 	}
-    
+
 	stop := time.Now()
-    fmt.Printf("All tests took %v to run.\n", stop.Sub(start))
+	fmt.Printf("All tests took %v to run.\n", stop.Sub(start))
 
 	if doReadDatabaseAndBuild {
 		buildStat := sgfdb.ReadDatabaseAndBuildPatterns(DatabaseDir, BoardPatternsDir, ah.WHOLE_BOARD_PATTERN, fileLimit, moveLimit, skipFiles)
@@ -1194,39 +1208,39 @@ func main() {
 			fmt.Printf("Errors while Reading TeachingDir, status = %d.\n", teachStat)
 		}
 	}
-    
-    if doReadWriteFuseki {
-        fusekiFile, err := ioutil.ReadFile(fusekiFileName)
-        if err != nil && err != io.EOF {
-            fmt.Printf("Error reading teaching Fuseki file: %s, %s\n", fusekiFileName, err)
-        } else {
-            prsr, errL := sgf.ParseFile(fusekiFileName, fusekiFile, 
-                sgf.ParseComments+sgf.GoGoD+sgf.Play, moveLimit)
-            if len(errL) != 0 {
-                fmt.Printf("Error %s during parsing: %s\n", errL.Error(), fusekiFileName)
-            } else {
-                    //TODO: add error reporting? ErrorList return value?
-                if (sgfProcessOptions & RemoveLabels) > 0 {
-                    fmt.Println("Removing labels from: ",fusekiFileName, " to ", outFusekiFileName);
-                    prsr.GameTree.BreadthFirstTraverse(true, sgf.DoRemoveLabels)
-                    prsr.GameTree.ReportDeletedProperties()
-                }
-                if (sgfProcessOptions & AddAllLabels) > 0 {
-                    fmt.Println("Adding labels to: ", outFusekiFileName, " from ", fusekiFileName);
-                    prsr.GameTree.DepthFirstTraverse(true, sgf.DoAddLabels)
-                    fmt.Println("The number of added labels = ",sgf.NumberOfAddedLabels)
-                }
+
+	if doReadWriteFuseki {
+		fusekiFile, err := ioutil.ReadFile(fusekiFileName)
+		if err != nil && err != io.EOF {
+			fmt.Printf("Error reading teaching Fuseki file: %s, %s\n", fusekiFileName, err)
+		} else {
+			prsr, errL := sgf.ParseFile(fusekiFileName, fusekiFile,
+				sgf.ParseComments+sgf.GoGoD+sgf.Play, moveLimit)
+			if len(errL) != 0 {
+				fmt.Printf("Error %s during parsing: %s\n", errL.Error(), fusekiFileName)
+			} else {
+				//TODO: add error reporting? ErrorList return value?
+				if (sgfProcessOptions & RemoveLabels) > 0 {
+					fmt.Println("Removing labels from: ", fusekiFileName, " to ", outFusekiFileName)
+					prsr.GameTree.BreadthFirstTraverse(true, sgf.DoRemoveLabels)
+					prsr.GameTree.ReportDeletedProperties()
+				}
+				if (sgfProcessOptions & AddAllLabels) > 0 {
+					fmt.Println("Adding labels to: ", outFusekiFileName, " from ", fusekiFileName)
+					prsr.GameTree.DepthFirstTraverse(true, sgf.DoAddLabels)
+					fmt.Println("The number of added labels = ", sgf.NumberOfAddedLabels)
+				}
 				err = prsr.GameTree.WriteFile(outFusekiFileName, 1)
 				if err != nil {
 					fmt.Printf("Error writing: %s, %s\n", outFusekiFileName, err)
 				} else {
-                    // Build ZCode mapping of unique board positions and transformations:
-                    // TODO: err = prsr.GameTree.BuildFusekiTable()
-                }
-            }
-        }
-    }
-    
+					// Build ZCode mapping of unique board positions and transformations:
+					// TODO: err = prsr.GameTree.BuildFusekiTable()
+				}
+			}
+		}
+	}
+
 	finish := time.Now()
 	fmt.Printf("Complete run took %v to run.\n", finish.Sub(start))
 }
