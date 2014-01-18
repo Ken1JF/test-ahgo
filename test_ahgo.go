@@ -60,7 +60,6 @@ var doAllTests bool
 var doPrintSizes bool
 var doPrintConstants bool
 var doPrintHandicaps bool
-var doPrintDirections bool // requires doPrintConstants to be true
 var doPrintSGFProperties bool
 var doPrintZKeys bool
 var doVerifySGFPropertyOrder bool
@@ -567,27 +566,6 @@ func TestTrans() {
 // Print the Direction and static PointStatus values:
 //
 func printConst() {
-	if doAllTests || doPrintDirections {
-		// Check Direction definitions:
-		// They should work as bit masks that can be ORed together
-		for d := ah.NoDir; d <= ah.RightDir; d++ {
-			switch d {
-			case ah.NoDir:
-				fmt.Println("NoDir:", d)
-			case ah.UpperDir:
-				fmt.Println("UpperDir:", d)
-			case ah.LeftDir:
-				fmt.Println("LeftDir:", d)
-			case ah.LowerDir:
-				fmt.Println("LowerDir:", d)
-			case ah.RightDir:
-				fmt.Println("RightDir:", d)
-			default:
-				//					fmt.Println(" skipping:", d)
-			}
-		}
-	}
-
 	// Check  PointType definitions:
 loop:
 	for pt := ah.SingletonPt; pt <= ah.Line_7_Pt; pt++ {
@@ -994,7 +972,6 @@ func init() {
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
 	flag.BoolVar(&doPrintSizes, "ps", false, "ps = print sizes. print the sizes of data types, false (default) means not to print sizes.")
 	flag.BoolVar(&doPrintConstants, "pc", false, "pc = print constants. print the values of constants, false (default) means not to print constants.")
-	flag.BoolVar(&doPrintDirections, "pd", false, "pd = print directions. print the values of directions, false (default) means not to print directions.")
 	flag.BoolVar(&doPrintHandicaps, "ph", false, "ph = print handicaps. print the canonical placement of handicaps, false (default) means not to print handicaps.")
 	flag.BoolVar(&doPrintSGFProperties, "pp", false, "pp = print SGF properties. print the SGF porperties, false (default) means not to print SGF properties.")
 	flag.BoolVar(&doPrintZKeys, "pzk", false, "pzk = print Z Keys. print the Zobrist Keys, false (default) means not to the Z Keys.")
@@ -1053,9 +1030,6 @@ func PrintOptionsSet() {
 	}
 	if doPrintConstants {
 		fmt.Printf("pc, print constants has value %t\n", doPrintConstants)
-	}
-	if doPrintDirections {
-		fmt.Printf("pd, print directions has value %t\n", doPrintDirections)
 	}
 	if doPrintHandicaps {
 		fmt.Printf("ph, print handicaps has value %t\n", doPrintHandicaps)
@@ -1148,7 +1122,7 @@ func main() {
 		PrintSizes()
 	}
 
-	if doAllTests || doPrintConstants || doPrintDirections {
+	if doAllTests || doPrintConstants {
 		printConst()
 	}
 
