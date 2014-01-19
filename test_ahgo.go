@@ -57,7 +57,6 @@ var SGFSpecFile = defaultSGFSpecFile
 //
 var doAllTests bool
 
-var doPrintSizes bool
 var doPrintHandicaps bool
 var doPrintSGFProperties bool
 var doPrintZKeys bool
@@ -650,14 +649,6 @@ func printBoard() {
 	fmt.Println("")
 }
 
-// Print the sizes of struct and type declarations, by package.
-//
-func PrintSizes() {
-	ah.PrintAhStructSizes()
-	sgf.PrintSGFStructSizes()
-	sgfdb.PrintSgfDbStructSizes()
-}
-
 // TODO: sort by second field (last name) if present
 func Gtr(a []byte, b []byte) bool {
 	idx := 0
@@ -791,7 +782,6 @@ func init() {
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
-	flag.BoolVar(&doPrintSizes, "ps", false, "ps = print sizes. print the sizes of data types, false (default) means not to print sizes.")
 	flag.BoolVar(&doPrintHandicaps, "ph", false, "ph = print handicaps. print the canonical placement of handicaps, false (default) means not to print handicaps.")
 	flag.BoolVar(&doPrintSGFProperties, "pp", false, "pp = print SGF properties. print the SGF porperties, false (default) means not to print SGF properties.")
 	flag.BoolVar(&doPrintZKeys, "pzk", false, "pzk = print Z Keys. print the Zobrist Keys, false (default) means not to the Z Keys.")
@@ -856,9 +846,6 @@ func PrintOptionsSet() {
 	}
 	if doPrintSGFProperties {
 		fmt.Printf("pp, print SGF properties has value %t\n", doPrintSGFProperties)
-	}
-	if doPrintSizes {
-		fmt.Printf("ps, print sizes has value %t\n", doPrintSizes)
 	}
 	if doPrintZKeys {
 		fmt.Printf("pzk, print the Z Keys has value %t\n", doPrintZKeys)
@@ -934,10 +921,6 @@ func main() {
 	}
 
 	PrintOptionsSet()
-
-	if doAllTests || doPrintSizes {
-		PrintSizes()
-	}
 
 	if sgf.Setup(SGFSpecFile, doAllTests || doVerifySGFPropertyOrder, doAllTests || doPrintSGFProperties) == 0 {
 
