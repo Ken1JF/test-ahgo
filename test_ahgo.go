@@ -58,7 +58,6 @@ var SGFSpecFile = defaultSGFSpecFile
 var doAllTests bool
 
 var doPrintSizes bool
-var doPrintConstants bool
 var doPrintHandicaps bool
 var doPrintSGFProperties bool
 var doPrintZKeys bool
@@ -563,101 +562,6 @@ func TestTrans() {
 	}
 }
 
-// Print the Direction and static PointStatus values:
-//
-func printConst() {
-	// Check  PointStatus definitions:
-	for ps := ah.UndefinedPointStatus; ps <= ah.LastPointStatus; ps++ {
-		switch ps {
-
-		case ah.UndefinedPointStatus:
-			fmt.Println("UndefinedPointStatus:", ps)
-
-			// Occupied, stone color
-		case ah.Black:
-			fmt.Println("Black:", ps)
-		case ah.White:
-			fmt.Println("White:", ps)
-
-			// Move types, for AB, AW, and AE properties:
-
-		case ah.AB_U:
-			fmt.Println("AB_U:", ps)
-		case ah.AB_W:
-			fmt.Println("AB_W:", ps)
-		case ah.AE_B:
-			fmt.Println("AE_B:", ps)
-		case ah.AE_W:
-			fmt.Println("AE_W:", ps)
-		case ah.AW_B:
-			fmt.Println("AW_B:", ps)
-		case ah.AW_U:
-			fmt.Println("AW_U:", ps)
-
-			// Unoccupied, generic value
-		case ah.Unocc:
-			fmt.Println("Unocc:", ps)
-
-			// No Adjacent Stones:
-		case ah.B0W0:
-			fmt.Println("B0W0:", ps)
-
-			// Single Adjacent Stone:
-		case ah.W1:
-			fmt.Println("W1:", ps)
-		case ah.B1:
-			fmt.Println("B1:", ps)
-
-			// Two Adjacent Stones:
-		case ah.W2:
-			fmt.Println("W2:", ps)
-		case ah.B1W1:
-			fmt.Println("B1W1:", ps)
-		case ah.W1B1:
-			fmt.Println("W1B1:", ps)
-		case ah.B2:
-			fmt.Println("B2:", ps)
-
-			// Three Adjacent Stones:
-		case ah.B3:
-			fmt.Println("B3:", ps)
-		case ah.B2W1:
-			fmt.Println("B2W1:", ps)
-		case ah.B1W2:
-			fmt.Println("B1W2:", ps)
-		case ah.W3:
-			fmt.Println("W3:", ps)
-		case ah.WBB:
-			fmt.Println("WBB:", ps)
-		case ah.WBW:
-			fmt.Println("WBW:", ps)
-		case ah.BWB:
-			fmt.Println("BWB:", ps)
-		case ah.W2B1:
-			fmt.Println("W2B1:", ps)
-
-			// Four Adjacent Stones:
-		case ah.B4:
-			fmt.Println("B4:", ps)
-		case ah.B3W1:
-			fmt.Println("B3W1:", ps)
-		case ah.BWBW:
-			fmt.Println("BWBW:", ps)
-		case ah.BBWW:
-			fmt.Println("BBWW:", ps)
-		case ah.B1W3:
-			fmt.Println("B1W3:", ps)
-		case ah.W4:
-			fmt.Println("W4:", ps)
-
-		case ah.LastPointStatus:
-			fmt.Println("LastPointStatus:", ps)
-
-		default:
-			//				fmt.Println(" skipping:", ps)
-		}
-	}
-}
 
 // checkHandicapCanonical
 //
@@ -888,7 +792,6 @@ func init() {
 
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
 	flag.BoolVar(&doPrintSizes, "ps", false, "ps = print sizes. print the sizes of data types, false (default) means not to print sizes.")
-	flag.BoolVar(&doPrintConstants, "pc", false, "pc = print constants. print the values of constants, false (default) means not to print constants.")
 	flag.BoolVar(&doPrintHandicaps, "ph", false, "ph = print handicaps. print the canonical placement of handicaps, false (default) means not to print handicaps.")
 	flag.BoolVar(&doPrintSGFProperties, "pp", false, "pp = print SGF properties. print the SGF porperties, false (default) means not to print SGF properties.")
 	flag.BoolVar(&doPrintZKeys, "pzk", false, "pzk = print Z Keys. print the Zobrist Keys, false (default) means not to the Z Keys.")
@@ -944,9 +847,6 @@ func PrintOptionsSet() {
 	}
 	if outFusekiFileName != defaultOutFusekiFileName {
 		fmt.Printf("offn, output Fuseki file name has value \"%s\"\n", outFusekiFileName)
-	}
-	if doPrintConstants {
-		fmt.Printf("pc, print constants has value %t\n", doPrintConstants)
 	}
 	if doPrintHandicaps {
 		fmt.Printf("ph, print handicaps has value %t\n", doPrintHandicaps)
@@ -1037,10 +937,6 @@ func main() {
 
 	if doAllTests || doPrintSizes {
 		PrintSizes()
-	}
-
-	if doAllTests || doPrintConstants {
-		printConst()
 	}
 
 	if sgf.Setup(SGFSpecFile, doAllTests || doVerifySGFPropertyOrder, doAllTests || doPrintSGFProperties) == 0 {
