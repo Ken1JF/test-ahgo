@@ -50,7 +50,6 @@ var SGFSpecFile = defaultSGFSpecFile
 // Some test and print controls.
 // default values are controlled by init()
 // final values are set by program arguments
-//
 var doAllTests bool
 
 var doSmallSGFTests bool
@@ -62,7 +61,6 @@ var doReadWriteFuseki bool
 
 // count should be 56 with all tests included.
 // One test currently in "WorkOnLater"
-//
 const SmallSGFTestOutputVerified int = 54  // controls the printing of last graph
 const SmallSGFTestStringsVerified int = 55 // controls tracing
 
@@ -422,7 +420,6 @@ func main() {
     // do not ask for verification of SGF Specification file,
     // or ask for verbose output. These are done in sgf_test.go
     // If that test is ok, then the file is ok.
-    //
     err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
 	if err == 0 {
 
