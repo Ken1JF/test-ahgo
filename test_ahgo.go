@@ -29,17 +29,13 @@ import (
 	"flag"
 	"io"
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"time"
-	//	"sort"
 	"fmt"
 	"gitHub.com/Ken1JF/ahgo/ah"
 	"gitHub.com/Ken1JF/ahgo/sgf"
 	"gitHub.com/Ken1JF/ahgo/sgfdb"
 	"runtime"
-
-	//	"unsafe"
 )
 
 const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with Go version 1.2 Generate whole board patterns...)"
@@ -57,12 +53,8 @@ var SGFSpecFile = defaultSGFSpecFile
 //
 var doAllTests bool
 
-var doPrintHandicaps bool
-var doPrintSGFProperties bool
 var doPrintZKeys bool
-var doVerifySGFPropertyOrder bool
 var doSmallSGFTests bool
-var doTransTest bool
 var doCountMoves bool
 var doReadWriteDatabase bool
 var doReadDatabaseAndBuild bool
@@ -133,17 +125,17 @@ var removeLabels = false
 var allLabels = false
 
 func ReadSmallSGFTests(dir string, outDir string) {
-	fmt.Println("Reading Small SGF Tests, dir = ", dir, ", outDir = ", outDir)
+	fmt.Println("Reading Small SGF Tests, dir =", dir, ", outDir =", outDir)
 	dirFiles, err := ioutil.ReadDir(dir)
 	if err != nil && err != io.EOF {
-		fmt.Println("Can't read test directory: ", dir)
+		fmt.Println("Can't read test directory:", dir)
 		return
 	}
 	count := 0
 	for _, f := range dirFiles {
 		if strings.Index(f.Name(), ".sgf") >= 0 {
 			count += 1
-			fmt.Println("Processing: ", f.Name())
+			fmt.Println("Processing:", f.Name())
 			if count > SmallSGFTestStringsVerified {
 				ah.SetAHTrace(true)
 				fmt.Println("Tracing", f.Name())
@@ -151,13 +143,13 @@ func ReadSmallSGFTests(dir string, outDir string) {
 			fileName := dir + f.Name()
 			b, err := ioutil.ReadFile(fileName)
 			if err != nil && err != io.EOF {
-				fmt.Println("Error reading file: ", fileName, err)
+				fmt.Println("Error reading file:", fileName, err)
 				return
 			}
 			//			prsr , errL := sgf.ParseFile(fileName, b, sgf.ParseComments, 0)
 			prsr, errL := sgf.ParseFile(fileName, b, sgf.ParseComments+sgf.Play, 0)
 			if len(errL) != 0 {
-				fmt.Println("Error while parsing: ", fileName, ", ", errL.Error())
+				fmt.Println("Error while parsing:", fileName, ", ", errL.Error())
 				return
 			}
 			if outDir != "" {
@@ -173,480 +165,6 @@ func ReadSmallSGFTests(dir string, outDir string) {
 			ah.SetAHTrace(false)
 		}
 	}
-}
-
-// Transformation test data:
-// For these tests, use char values instead of defined PointStatus values
-//
-var test_5 = []string{
-	"1....",
-	"2..x.",
-	"3.+..",
-	"4....",
-	"5....",
-}
-
-var test_7 = []string{
-	"1......",
-	"2......",
-	"3.+.+..",
-	"4...x..",
-	"5.+.+..",
-	"6......",
-	"7......",
-}
-
-var test_9 = []string{
-	"1........",
-	"2........",
-	"3.+...+..",
-	"4.....x..",
-	"5........",
-	"6........",
-	"7.+...+..",
-	"8........",
-	"9........",
-}
-
-var test_11 = []string{
-	"1..........",
-	"2..........",
-	"3.+.....+..",
-	"4.......x..",
-	"5..........",
-	"6....+.....",
-	"7..........",
-	"8..........",
-	"9.+.....+..",
-	"A..........",
-	"B..........",
-}
-
-var test_13 = []string{
-	"1............",
-	"2............",
-	"3............",
-	"4..+.....+X..",
-	"5............",
-	"6............",
-	"7....+.......",
-	"8............",
-	"9............",
-	"A..+.....+...",
-	"B............",
-	"C............",
-	"D............",
-}
-
-var test_15 = []string{
-	"1..............",
-	"2..............",
-	"3..............",
-	"4..+.......+X..",
-	"5..............",
-	"6..............",
-	"7..............",
-	"8.....+........",
-	"9..............",
-	"A..............",
-	"B..............",
-	"C..+.......+...",
-	"D..............",
-	"E..............",
-	"F..............",
-}
-
-var test_17 = []string{
-	"1................",
-	"2................",
-	"3................",
-	"4..+.........+X..",
-	"5................",
-	"6................",
-	"7................",
-	"8................",
-	"9......+.........",
-	"A................",
-	"B................",
-	"C................",
-	"D................",
-	"E..+.........+...",
-	"F................",
-	"G................",
-	"H................",
-}
-
-var test_19 = []string{
-	"1..................",
-	"2..................",
-	"3..................",
-	"4..+.....+.....+X..",
-	"5..................",
-	"6..................",
-	"7..................",
-	"8..................",
-	"9..................",
-	"A..+.....+.....+...",
-	"B..................",
-	"C..................",
-	"D..................",
-	"E..................",
-	"F..................",
-	"G..+.....+.....+...",
-	"H..................",
-	"I..................",
-	"J..................",
-}
-
-// printInitBoard prints the PointType values
-// after a Board is initialized (via SetSize)
-//
-func printInitBoard(abhr *ah.AbstHier, title string) {
-
-	//	Black_Occ_Pt:		"◉",
-	//	White_Occ_Pt:		"◎",
-
-	var c ah.ColValue
-	var r ah.RowValue
-	nCol, nRow := abhr.GetSize()
-	fmt.Println(title, "Board", nCol, "by", nRow)
-	for r = 0; r < nRow; r++ {
-		for c = 0; c < nCol; c++ {
-			bp := abhr.Graphs[ah.PointLevel].GetPoint(c, r)
-			hs := bp.GetNodeHighState()
-			if hs == uint16(ah.White) {
-				fmt.Print("◎")
-			} else if hs == uint16(ah.Black) {
-				fmt.Print("◉")
-			} else {
-				fmt.Print(ah.PtTypeNames[bp.GetPointType()])
-			}
-		}
-		fmt.Println(" ")
-	}
-}
-
-// printInitBoard2 is equivalent to printInitBoard
-// but uses the iteration function ah.EachNode
-// and a literal func.
-//
-func printInitBoard2(abhr *ah.AbstHier) {
-	var row ah.RowValue = 0
-	nCol, nRow := abhr.GetSize()
-	fmt.Println("Board", nCol, "by", nRow)
-	abhr.EachNode(ah.PointLevel,
-		func(brd *ah.Graph, nl ah.NodeLoc) {
-			_, r := brd.Nodes[nl].GetPointColRow()
-			if r != row {
-				fmt.Println(" ")
-				row = r
-			}
-			fmt.Print(ah.PtTypeNames[brd.Nodes[nl].GetPointType()])
-		})
-	fmt.Println(" ")
-}
-
-// differBrds checks the LowStates of the Nodes
-// only suitable for special set boards
-//
-func differBrds(brd1, brd2 *ah.AbstHier) (ret bool) {
-	var c ah.ColValue
-	var r ah.RowValue
-	nCol, nRow := brd1.GetSize()
-	nCol2, nRow2 := brd2.GetSize()
-	if (nCol != nCol2) || (nRow != nRow2) {
-		ret = true
-	} else {
-		for r = 0; r < nRow; r++ {
-			for c = 0; c < nCol; c++ {
-				nl := ah.MakeNodeLoc(c, r)
-				bp1 := &brd1.Graphs[ah.PointLevel].Nodes[nl]
-				bp2 := &brd2.Graphs[ah.PointLevel].Nodes[nl]
-				if bp1.GetNodeLowState() != bp2.GetNodeLowState() {
-					ret = true
-					break
-				}
-			}
-		}
-	}
-	return ret
-}
-
-// checkHandicapBrds checks the LowStates of the Nodes
-// only suitable for special set boards
-//
-func checkHandicapBrds(brd1, brd2 *ah.AbstHier) (ret bool) {
-	var c ah.ColValue
-	var r ah.RowValue
-	nCol, nRow := brd1.GetSize()
-	nCol2, nRow2 := brd2.GetSize()
-	if (nCol != nCol2) || (nRow != nRow2) {
-		ret = true
-	} else {
-		for r = 0; r < nRow; r++ {
-			for c = 0; c < nCol; c++ {
-				nl := ah.MakeNodeLoc(c, r)
-				bp1 := &brd1.Graphs[ah.PointLevel].Nodes[nl]
-				bp2 := &brd2.Graphs[ah.PointLevel].Nodes[nl]
-				low1 := bp1.GetNodeLowState()
-				low2 := bp2.GetNodeLowState()
-				// check that both are occupied or unoccupied
-				if ah.IsOccupied(ah.PointStatus(low1)) != ah.IsOccupied(ah.PointStatus(low2)) {
-					ret = true
-					break
-				}
-			}
-		}
-	}
-	return ret
-}
-
-// Print the boards, after transformation
-//
-func printBrds(msg string, brd *ah.AbstHier, newBrd *ah.AbstHier, tName string) {
-	var c ah.ColValue
-	var r ah.RowValue
-	nCol, nRow := brd.GetSize()
-	fmt.Println("Board size", nCol, "by", nRow, "after", tName)
-	for r = 0; r < nRow; r++ {
-		for c = 0; c < nCol; c++ {
-			bp := brd.Graphs[ah.PointLevel].GetPoint(c, r)
-			ch := bp.GetNodeLowState()
-			fmt.Printf("%c", byte(ch))
-		}
-		fmt.Print("     ")
-		for c = 0; c < nCol; c++ {
-			nbp := newBrd.Graphs[ah.PointLevel].GetPoint(c, r)
-			ch := nbp.GetNodeLowState()
-			fmt.Printf("%c", byte(ch))
-		}
-		fmt.Println(" ")
-	}
-}
-
-// SetUpTestBoard stores the test data (string characters)
-// in the Board as PointStatus information.
-//
-func SetUpTestBoard(N int, brd *ah.AbstHier, data *[]string) {
-	for r := 0; r < N; r++ {
-		for c := 0; c < N; c++ {
-			brd.SetPoint(ah.MakeNodeLoc(ah.ColValue(c), ah.RowValue(r)), ah.PointStatus((*data)[r][c]))
-		}
-	}
-}
-
-// Eight boards of various sizes.
-var brd_5, brd_7, brd_9, brd_11, brd_13, brd_15, brd_17, brd_19 *ah.AbstHier
-
-// and an array to hold them.
-var brds [8]*ah.AbstHier
-
-// Test the transformation logic
-//
-func TestTrans() {
-	// Set up the test data boards.
-	var col ah.ColValue
-	var row ah.RowValue
-	for size := 5; size <= 19; size += 2 {
-		switch size {
-		case 5:
-			col = 5
-			row = 5
-			brd_5 = brd_5.InitAbstHier(col, row, ah.StringLevel, true)
-			//				ah.SetAHTrace(false)
-			printInitBoard(brd_5, "Initial 5x5 Board")
-			brd_5.PrintAbstHier("Initial 5x5 Board", true)
-			SetUpTestBoard(size, brd_5, &test_5)
-			brds[0] = brd_5
-		case 7:
-			col = 7
-			row = 7
-			//				brd_7 = new(ah.AbstHier)
-			//				brd_7.SetSize(col, row)
-			brd_7 = brd_7.InitAbstHier(col, row, ah.StringLevel, true)
-			printInitBoard2(brd_7)
-			SetUpTestBoard(size, brd_7, &test_7)
-			brds[1] = brd_7
-		case 9:
-			col = 9
-			row = 9
-			//				brd_9 = new(ah.AbstHier)
-			//				brd_9.SetSize(col, row)
-			brd_9 = brd_9.InitAbstHier(col, row, ah.StringLevel, true)
-			printInitBoard(brd_9, "Initial 9x9 Board")
-			SetUpTestBoard(size, brd_9, &test_9)
-			brds[2] = brd_9
-		case 11:
-			col = 11
-			row = 11
-			//				brd_11 = new(ah.AbstHier)
-			//				brd_11.SetSize(col, row)
-			brd_11 = brd_11.InitAbstHier(col, row, ah.StringLevel, true)
-			printInitBoard2(brd_11)
-			SetUpTestBoard(size, brd_11, &test_11)
-			brds[3] = brd_11
-		case 13:
-			col = 13
-			row = 13
-			brd_13 = brd_13.InitAbstHier(col, row, ah.StringLevel, true)
-			printInitBoard(brd_13, "Initial 13x13 Board")
-			SetUpTestBoard(size, brd_13, &test_13)
-			brds[4] = brd_13
-		case 15:
-			col = 15
-			row = 15
-			brd_15 = brd_15.InitAbstHier(col, row, ah.StringLevel, true)
-			printInitBoard2(brd_15)
-			SetUpTestBoard(size, brd_15, &test_15)
-			brds[5] = brd_15
-		case 17:
-			col = 17
-			row = 17
-			brd_17 = brd_17.InitAbstHier(col, row, ah.StringLevel, true)
-			printInitBoard(brd_17, "Initial 17x17 Board")
-			SetUpTestBoard(size, brd_17, &test_17)
-			brds[6] = brd_17
-		case 19:
-			col = 19
-			row = 19
-			brd_19 = brd_19.InitAbstHier(col, row, ah.StringLevel, true)
-			printInitBoard2(brd_19)
-			SetUpTestBoard(size, brd_19, &test_19)
-			brds[7] = brd_19
-		}
-	}
-	// Print each board, after applying one of the transformations,
-	// and print it (for visual verification)
-	//	ah.SetAHTrace(true) // trace first one
-	for i, brd := range brds {
-		fmt.Println("Checking brds[", i, "]")
-		if brd == nil {
-			fmt.Println("Error in setup: brd == nil")
-		} else {
-			newBrd := brd.TransBoard(ah.BoardTrans(i))
-			printBrds("Visual Check", brd, newBrd, ah.TransName[i])
-		}
-		ah.SetAHTrace(false) // turn off after first one
-	}
-	// Verify that the inverse transformations produce the original
-	for i, brd := range brds {
-		t := ah.BoardTrans(i)
-		inv := ah.InverseTrans[t]
-		fmt.Println("Checking", ah.TransName[i], "and its inverse:", ah.TransName[inv])
-		newBrd := brd.TransBoard(t)
-		newBrdInv := newBrd.TransBoard(inv)
-		if differBrds(brd, newBrdInv) {
-			printBrds("Error: inverse differs", brd, newBrdInv, ah.TransName[i])
-		}
-	}
-	// Verify the transformation composition table
-	nxtBrd := 0 // used to pick the next board
-	for A := ah.T_FIRST; A <= ah.T_LAST; A++ {
-		for B := ah.T_FIRST; B <= ah.T_LAST; B++ {
-			C := ah.ComposeTrans[A][B]
-			fmt.Println("Checking", ah.TransName[C], " = ", ah.TransName[A], "*", ah.TransName[B])
-			brd := brds[nxtBrd]
-			nxtBrd++
-			if nxtBrd >= 8 {
-				nxtBrd = 0
-			}
-			brdA := brd.TransBoard(A)
-			brdAB := brdA.TransBoard(B)
-			brdC := brd.TransBoard(C)
-			if differBrds(brdAB, brdC) {
-				printBrds("Error: "+ah.TransName[ah.ComposeTrans[A][B]], brdAB, brdC,
-					"not equal"+ah.TransName[A]+"*"+ah.TransName[B])
-			}
-		}
-	}
-}
-
-
-// checkHandicapCanonical
-//
-func checkHandicapCanonical() {
-	// Verify that the handicap patterns are preserved by transformaions,
-	for i, brd := range brds {
-		t := ah.BoardTrans(i)
-		inv := ah.InverseTrans[t]
-		fmt.Println("Checking", ah.TransName[i], "and its inverse:", ah.TransName[inv])
-		if brd != nil {
-			newBrd := brd.TransBoard(t)
-			newBrdInv := newBrd.TransBoard(inv)
-			if differBrds(brd, newBrdInv) {
-				printBrds("Error: inverse differs", brd, newBrdInv, ah.TransName[i])
-			}
-		} else {
-			fmt.Println("Error: brds [", i, "] has not been initialized.")
-		}
-	}
-
-}
-
-// printCannonicalHandicap points]
-//
-func printCannonicalHandicap() {
-	for ha := 0; ha <= 9; ha++ {
-		if ha != 1 {
-			var gam *sgf.GameTree = new(sgf.GameTree)
-			gam.InitAbstHier(19, 19, ah.StringLevel, true)
-			gam.SetHandicap(ha)
-			gam.PlaceHandicap(ha, 19)
-			for r := 0; r < 19; r++ {
-				for c := 0; c < 19; c++ {
-					nl := ah.MakeNodeLoc(ah.ColValue(c), ah.RowValue(r))
-					bp := &gam.Graphs[ah.PointLevel].Nodes[nl]
-					if bp.GetNodeLowState() != uint16(ah.Black) {
-						if gam.IsCanonical(nl, ah.BoardHandicapSymmetry[ha]) {
-							bp.SetNodeHighState(uint16(ah.White))
-							//gam.SetPoint(nl, ah.White)
-						}
-					}
-				}
-			}
-			str := "Handicap pattern " + strconv.Itoa(ha)
-			printInitBoard(&gam.AbstHier, str)
-			for trans := ah.T_FIRST; trans <= ah.T_LAST; trans += 1 {
-				newBrd := gam.AbstHier.TransBoard(trans)
-				if checkHandicapBrds(&gam.AbstHier, newBrd) {
-					fmt.Print("false,  /* ", ah.TransName[trans], " */ ")
-					// TODO: replace?					printBrds("Error: inverse differs", &gam.AbstHier, newBrd, ah.TransName[trans])
-				} else {
-					fmt.Print("true, /* ", ah.TransName[trans], " */ ")
-				}
-			}
-			fmt.Println()
-		}
-	}
-	checkHandicapCanonical()
-}
-
-// test EachNode and EachAdjNode
-func printBoard() {
-	var thePt *ah.GraphNode
-
-	printPoint := func(nl ah.NodeLoc) {
-		pp := &brds[3].Graphs[ah.PointLevel].Nodes[nl]
-		if pp == thePt {
-			fmt.Println("")
-		}
-		c, r := pp.GetPointColRow()
-		fmt.Printf("[%d,%d]", c, r)
-		if pp == thePt {
-			fmt.Print(": ")
-		} else {
-			fmt.Print(", ")
-		}
-	}
-
-	brds[3].EachNode(ah.PointLevel,
-		func(brd *ah.Graph, nl ah.NodeLoc) {
-			bp := &brd.Nodes[nl]
-			thePt = bp
-			printPoint(nl)
-			brds[3].EachAdjNode(ah.PointLevel, nl, printPoint)
-		})
-	fmt.Println("")
 }
 
 // TODO: sort by second field (last name) if present
@@ -782,12 +300,8 @@ func init() {
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
-	flag.BoolVar(&doPrintHandicaps, "ph", false, "ph = print handicaps. print the canonical placement of handicaps, false (default) means not to print handicaps.")
-	flag.BoolVar(&doPrintSGFProperties, "pp", false, "pp = print SGF properties. print the SGF porperties, false (default) means not to print SGF properties.")
 	flag.BoolVar(&doPrintZKeys, "pzk", false, "pzk = print Z Keys. print the Zobrist Keys, false (default) means not to the Z Keys.")
-	flag.BoolVar(&doVerifySGFPropertyOrder, "vpo", false, "vpo = verify SGF property order, after reading SGF_Properties_Spec.txt file, false (default) means do not verify.")
 	flag.BoolVar(&doSmallSGFTests, "sst", false, "sst = do Small SGF Tests, false (default) means do not do these tests.")
-	flag.BoolVar(&doTransTest, "tt", false, "tt = do Trans Test, false (default) means do not do Trans test.")
 	flag.BoolVar(&doCountMoves, "cm", false, "cm = do Count Moves, false (default) means do not do count moves.")
 	flag.BoolVar(&doReadWriteDatabase, "rwd", false, "rwd = do Read and Write Database, false (default) means do not read and write database.")
 	flag.BoolVar(&doReadDatabaseAndBuild, "rdab", false, "rdab = do Read Database And Build patterns, false (default) means do not do Read Database And Build patterns.")
@@ -838,14 +352,8 @@ func PrintOptionsSet() {
 	if outFusekiFileName != defaultOutFusekiFileName {
 		fmt.Printf("offn, output Fuseki file name has value \"%s\"\n", outFusekiFileName)
 	}
-	if doPrintHandicaps {
-		fmt.Printf("ph, print handicaps has value %t\n", doPrintHandicaps)
-	}
 	if patternLimit != 0 {
 		fmt.Printf("pl, pattern limit has value %d\n", patternLimit)
-	}
-	if doPrintSGFProperties {
-		fmt.Printf("pp, print SGF properties has value %t\n", doPrintSGFProperties)
 	}
 	if doPrintZKeys {
 		fmt.Printf("pzk, print the Z Keys has value %t\n", doPrintZKeys)
@@ -889,12 +397,6 @@ func PrintOptionsSet() {
 	if TeachingPatternsDir != defaultTeachingPatternsDir {
 		fmt.Printf("tpdir, teaching patterns directory has value \"%s\"\n", TeachingPatternsDir)
 	}
-	if doTransTest {
-		fmt.Printf("tt, do trans test has value %t\n", doTransTest)
-	}
-	if doVerifySGFPropertyOrder {
-		fmt.Printf("vpo, verify SGF property order has value %t\n", doVerifySGFPropertyOrder)
-	}
 }
 
 func main() {
@@ -922,20 +424,16 @@ func main() {
 
 	PrintOptionsSet()
 
-	if sgf.Setup(SGFSpecFile, doAllTests || doVerifySGFPropertyOrder, doAllTests || doPrintSGFProperties) == 0 {
+    // do not ask for verification of SGF Specification file,
+    // or ask for verbose output. These are done in sgf_test.go
+    // If that test is ok, then the file is ok.
+    //
+    err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
+	if err == 0 {
 
 		if doAllTests || doSmallSGFTests {
 			ReadSmallSGFTests(SmallSGFTestDir, SmallSGFTestOutDir)
 			ah.SetAHTrace(false)
-		}
-
-		if doAllTests || doTransTest {
-			TestTrans()
-			printBoard()
-		}
-
-		if doAllTests || doPrintHandicaps {
-			printCannonicalHandicap()
 		}
 
 		if doAllTests || doCountMoves {
@@ -946,15 +444,17 @@ func main() {
 
 	setup_and_count := time.Now()
 
-	fmt.Printf("Setup and CountFilesAndMoves took %v to run.\n", setup_and_count.Sub(start))
-
-	if doAllTests || doReadWriteDatabase {
-		stat := sgfdb.ReadAndWriteDatabase(DatabaseDir, TestOutDir, fileLimit, moveLimit, skipFiles)
-		if stat > 0 {
-			fmt.Printf("Errors during reading and writing database: %d\n", stat)
-		}
-		ReportSGFCounts()
-	}
+    if err == 0 { // don't try these tests if SGF Setup failed.
+        fmt.Printf("Setup and CountFilesAndMoves took %v to run.\n", setup_and_count.Sub(start))
+        
+        if doAllTests || doReadWriteDatabase {
+            stat := sgfdb.ReadAndWriteDatabase(DatabaseDir, TestOutDir, fileLimit, moveLimit, skipFiles)
+            if stat > 0 {
+                fmt.Printf("Errors during reading and writing database: %d\n", stat)
+            }
+            ReportSGFCounts()
+        }
+    }
 
 	if doAllTests || doPrintZKeys {
 		ah.PrintZKeys()
@@ -963,52 +463,55 @@ func main() {
 	stop := time.Now()
 	fmt.Printf("All tests took %v to run.\n", stop.Sub(start))
 
-	if doReadDatabaseAndBuild {
-		buildStat := sgfdb.ReadDatabaseAndBuildPatterns(DatabaseDir, BoardPatternsDir, ah.WHOLE_BOARD_PATTERN, fileLimit, moveLimit, skipFiles)
-
-		if buildStat > 0 {
-			fmt.Printf("Errors during Build Patterns, status = %d.\n", buildStat)
-		}
-	}
-
-	if doReadTeachingGames {
-		teachStat := sgfdb.ReadTeachingDirectory(TeachingDir, TeachingPatternsDir, fileLimit, moveLimit, patternLimit, skipFiles)
-
-		if teachStat > 0 {
-			fmt.Printf("Errors while Reading TeachingDir, status = %d.\n", teachStat)
-		}
-	}
-
-	if doReadWriteFuseki {
-		fusekiFile, err := ioutil.ReadFile(fusekiFileName)
-		if err != nil && err != io.EOF {
-			fmt.Printf("Error reading teaching Fuseki file: %s, %s\n", fusekiFileName, err)
-		} else {
-			prsr, errL := sgf.ParseFile(fusekiFileName, fusekiFile,
-				sgf.ParseComments+sgf.GoGoD+sgf.Play, moveLimit)
-			if len(errL) != 0 {
-				fmt.Printf("Error %s during parsing: %s\n", errL.Error(), fusekiFileName)
-			} else {
-				//TODO: add error reporting? ErrorList return value?
-				if (sgfProcessOptions & RemoveLabels) > 0 {
-					fmt.Println("Removing labels from: ", fusekiFileName, " to ", outFusekiFileName)
-					prsr.GameTree.BreadthFirstTraverse(true, sgf.DoRemoveLabels)
-					prsr.GameTree.ReportDeletedProperties()
-				}
-				if (sgfProcessOptions & AddAllLabels) > 0 {
-					fmt.Println("Adding labels to: ", outFusekiFileName, " from ", fusekiFileName)
-					prsr.GameTree.DepthFirstTraverse(true, sgf.DoAddLabels)
-					fmt.Println("The number of added labels = ", sgf.NumberOfAddedLabels)
-				}
-				err = prsr.GameTree.WriteFile(outFusekiFileName, 1)
-				if err != nil {
-					fmt.Printf("Error writing: %s, %s\n", outFusekiFileName, err)
-				} else {
-					// Build ZCode mapping of unique board positions and transformations:
-					// TODO: err = prsr.GameTree.BuildFusekiTable()
-				}
-			}
-		}
+    if err == 0 { // don't try these tests if SGF Setup failed.
+        if doReadDatabaseAndBuild {
+            buildStat := sgfdb.ReadDatabaseAndBuildPatterns(DatabaseDir, BoardPatternsDir, ah.WHOLE_BOARD_PATTERN, fileLimit, moveLimit, skipFiles)
+            
+            if buildStat > 0 {
+                fmt.Printf("Errors during Build Patterns, status = %d.\n", buildStat)
+            }
+        }
+        
+        if doReadTeachingGames {
+            teachStat := sgfdb.ReadTeachingDirectory(TeachingDir, TeachingPatternsDir, fileLimit, moveLimit, patternLimit, skipFiles)
+            
+            if teachStat > 0 {
+                fmt.Printf("Errors while Reading TeachingDir, status = %d.\n", teachStat)
+            }
+        }
+        
+        if doReadWriteFuseki {
+            fusekiFile, err := ioutil.ReadFile(fusekiFileName)
+            if err != nil && err != io.EOF {
+                fmt.Printf("Error reading teaching Fuseki file: %s, %s\n", fusekiFileName, err)
+            } else {
+                prsr, errL := sgf.ParseFile(fusekiFileName, fusekiFile,
+                                            sgf.ParseComments+sgf.GoGoD+sgf.Play, moveLimit)
+                if len(errL) != 0 {
+                    fmt.Printf("Error %s during parsing: %s\n", errL.Error(), fusekiFileName)
+                } else {
+                        //TODO: add error reporting? ErrorList return value?
+                    if (sgfProcessOptions & RemoveLabels) > 0 {
+                        fmt.Println("Removing labels from:", fusekiFileName, "to", outFusekiFileName)
+                        prsr.GameTree.BreadthFirstTraverse(true, sgf.DoRemoveLabels)
+                        prsr.GameTree.ReportDeletedProperties()
+                    }
+                    if (sgfProcessOptions & AddAllLabels) > 0 {
+                        fmt.Println("Adding labels to:", outFusekiFileName, "from", fusekiFileName)
+                        prsr.GameTree.DepthFirstTraverse(true, sgf.DoAddLabels)
+                        fmt.Println("The number of added labels =", sgf.NumberOfAddedLabels)
+                    }
+                    err = prsr.GameTree.WriteFile(outFusekiFileName, 1)
+                    if err != nil {
+                        fmt.Printf("Error writing: %s, %s\n", outFusekiFileName, err)
+                    } else {
+                            // Build ZCode mapping of unique board positions and transformations:
+                            // TODO: err = prsr.GameTree.BuildFusekiTable()
+                    }
+                }
+            }
+        }
+    
 	}
 
 	finish := time.Now()
