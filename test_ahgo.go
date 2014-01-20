@@ -53,7 +53,6 @@ var SGFSpecFile = defaultSGFSpecFile
 //
 var doAllTests bool
 
-var doPrintZKeys bool
 var doSmallSGFTests bool
 var doCountMoves bool
 var doReadWriteDatabase bool
@@ -300,7 +299,6 @@ func init() {
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
-	flag.BoolVar(&doPrintZKeys, "pzk", false, "pzk = print Z Keys. print the Zobrist Keys, false (default) means not to the Z Keys.")
 	flag.BoolVar(&doSmallSGFTests, "sst", false, "sst = do Small SGF Tests, false (default) means do not do these tests.")
 	flag.BoolVar(&doCountMoves, "cm", false, "cm = do Count Moves, false (default) means do not do count moves.")
 	flag.BoolVar(&doReadWriteDatabase, "rwd", false, "rwd = do Read and Write Database, false (default) means do not read and write database.")
@@ -354,9 +352,6 @@ func PrintOptionsSet() {
 	}
 	if patternLimit != 0 {
 		fmt.Printf("pl, pattern limit has value %d\n", patternLimit)
-	}
-	if doPrintZKeys {
-		fmt.Printf("pzk, print the Z Keys has value %t\n", doPrintZKeys)
 	}
 	if doReadDatabaseAndBuild {
 		fmt.Printf("rdab, do read database and build has value %t\n", doReadDatabaseAndBuild)
@@ -455,10 +450,6 @@ func main() {
             ReportSGFCounts()
         }
     }
-
-	if doAllTests || doPrintZKeys {
-		ah.PrintZKeys()
-	}
 
 	stop := time.Now()
 	fmt.Printf("All tests took %v to run.\n", stop.Sub(start))
