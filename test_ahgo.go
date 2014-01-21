@@ -52,7 +52,6 @@ var SGFSpecFile = defaultSGFSpecFile
 // final values are set by program arguments
 var doAllTests bool
 
-var doSmallSGFTests bool
 var doCountMoves bool
 var doReadWriteDatabase bool
 var doReadDatabaseAndBuild bool
@@ -297,7 +296,6 @@ func init() {
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
-	flag.BoolVar(&doSmallSGFTests, "sst", false, "sst = do Small SGF Tests, false (default) means do not do these tests.")
 	flag.BoolVar(&doCountMoves, "cm", false, "cm = do Count Moves, false (default) means do not do count moves.")
 	flag.BoolVar(&doReadWriteDatabase, "rwd", false, "rwd = do Read and Write Database, false (default) means do not read and write database.")
 	flag.BoolVar(&doReadDatabaseAndBuild, "rdab", false, "rdab = do Read Database And Build patterns, false (default) means do not do Read Database And Build patterns.")
@@ -372,9 +370,6 @@ func PrintOptionsSet() {
 	if SGFSpecFile != defaultSGFSpecFile {
 		fmt.Printf("ssf, SGF specification file has value \"%s\"\n", SGFSpecFile)
 	}
-	if doSmallSGFTests {
-		fmt.Printf("sst, do small SGF tests has value %t\n", doSmallSGFTests)
-	}
 	if SmallSGFTestDir != defaultSmallSGFTestDir {
 		fmt.Printf("sstdir, small SGF test directory has value \"%s\"\n", SmallSGFTestDir)
 	}
@@ -422,11 +417,6 @@ func main() {
     // If that test is ok, then the file is ok.
     err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
 	if err == 0 {
-
-		if doAllTests || doSmallSGFTests {
-			ReadSmallSGFTests(SmallSGFTestDir, SmallSGFTestOutDir)
-			ah.SetAHTrace(false)
-		}
 
 		if doAllTests || doCountMoves {
 			ah.SetAHTrace(false)
