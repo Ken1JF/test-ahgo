@@ -43,7 +43,8 @@ const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with 
 const DO_MULTI_CPU = true
 
 // SGF Specification file is copied from a different project: Projects/GenSGFProperties
-const defaultSGFSpecFile = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
+// const defaultSGFSpecFile = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
+const defaultSGFSpecFile = "src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
 
 var SGFSpecFile = defaultSGFSpecFile
 
@@ -417,7 +418,6 @@ func main() {
     // If that test is ok, then the file is ok.
     err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
 	if err == 0 {
-
 		if doAllTests || doCountMoves {
 			ah.SetAHTrace(false)
 			sgfdb.CountFilesAndMoves(DatabaseDir, fileLimit)
