@@ -53,7 +53,6 @@ var SGFSpecFile = defaultSGFSpecFile
 // final values are set by program arguments
 var doAllTests bool
 
-var doCountMoves bool
 var doReadWriteDatabase bool
 var doReadDatabaseAndBuild bool
 var doReadTeachingGames bool
@@ -297,7 +296,6 @@ func init() {
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
-	flag.BoolVar(&doCountMoves, "cm", false, "cm = do Count Moves, false (default) means do not do count moves.")
 	flag.BoolVar(&doReadWriteDatabase, "rwd", false, "rwd = do Read and Write Database, false (default) means do not read and write database.")
 	flag.BoolVar(&doReadDatabaseAndBuild, "rdab", false, "rdab = do Read Database And Build patterns, false (default) means do not do Read Database And Build patterns.")
 	flag.BoolVar(&doReadTeachingGames, "rtg", false, "rtg = do Read Teaching Games, false (default) means do not do read teaching games.")
@@ -328,9 +326,6 @@ func PrintOptionsSet() {
 	}
 	if BoardPatternsDir != defaultBoardPatternsDir {
 		fmt.Printf("bpdir, board patterns directory has value \"%s\"\n", BoardPatternsDir)
-	}
-	if doCountMoves {
-		fmt.Printf("cm, do count moves has value %t\n", doCountMoves)
 	}
 	if DatabaseDir != defaultDatabaseDir {
 		fmt.Printf("dbdir, data base directory has value \"%s\"\n", DatabaseDir)
@@ -417,12 +412,6 @@ func main() {
     // or ask for verbose output. These are done in sgf_test.go
     // If that test is ok, then the file is ok.
     err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
-	if err == 0 {
-		if doAllTests || doCountMoves {
-			ah.SetAHTrace(false)
-			sgfdb.CountFilesAndMoves(DatabaseDir, fileLimit)
-		}
-	}
 
 	setup_and_count := time.Now()
 
