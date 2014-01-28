@@ -22,11 +22,13 @@ The test program is in:
     
 There is a script to build and run the tests:
     abst-hier/src/buildScript.bash
+        TODO: add to a repo. Which one? ahgo?
     
 Some major tests:
     rwd, do read write database
         after this test, run "./checkout.txt" in
             TODO: add to abst-hier
+            TODO: get a golden output, then stop using
 
 Working on:
     Processing: Fuseki.sgf - a file of Fuseki openings.
@@ -47,7 +49,8 @@ Working on:
     Fuseki3 and Fuseki2C have the same 8 labels, dp:A -> ec:H, for the second layer, but in different orders on output...
         Fuseki3 has order A -> H
         Fuseki2 has order cc, dc, ec, cd, dd, cp, dp, cq, i.e. col-row, sorted by row, then col.
-TODO: 
+TODO:
+    Fix so Fuseki3.sgf is correct. (file or movelimit breaking?)
     read the GoGoD databases, record frequency and results.
     construct other databases for handicaps
     split records based on Komi and Rules.

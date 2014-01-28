@@ -18,7 +18,7 @@
  *
  *	When new functionality is added and output is verified:
  *		rm test_ahgo_out.txt
- *		mv test_ahgo_new.txt test_ahgo_out.txt
+ *		cp test_ahgo_new.txt test_ahgo_out.txt
  *	build and run using buildScript.bash
  *		diff test_ahgo_new.txt test_ahgo_out.txt
  */
@@ -27,15 +27,15 @@ package main
 
 import (
 	"flag"
-	"io"
-	"io/ioutil"
-	"strings"
-	"time"
 	"fmt"
 	"github.com/Ken1JF/ah"
 	"github.com/Ken1JF/sgf"
 	"github.com/Ken1JF/sgfdb"
+	"io"
+	"io/ioutil"
 	"runtime"
+	"strings"
+	"time"
 )
 
 const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with Go version 1.2 Generate whole board patterns...)"
@@ -94,11 +94,11 @@ const defaultTeachingPatternsDir = "/Users/ken/Documents/GO/Games/teaching/patte
 
 var TeachingPatternsDir = defaultTeachingPatternsDir
 
-const defaultFusekiFileName = "/Users/ken/Projects/abst-hier/src/github.com/Ken1JF/Fuseki.sgf"
+const defaultFusekiFileName = "./Fuseki.sgf"
 
 var fusekiFileName = defaultFusekiFileName
 
-const defaultOutFusekiFileName = "/Users/ken/Projects/abst-hier/src/github.com/Ken1JF/Fuseki2.sgf"
+const defaultOutFusekiFileName = "./Fuseki2.sgf"
 
 var outFusekiFileName = defaultOutFusekiFileName
 
@@ -282,77 +282,77 @@ func main() {
 
 	PrintOptionsSet()
 
-    // do not ask for verification of SGF Specification file,
-    // or ask for verbose output. These are done in sgf_test.go
-    // If that test is ok, then the file is ok.
-    err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
+	// do not ask for verification of SGF Specification file,
+	// or ask for verbose output. These are done in sgf_test.go
+	// If that test is ok, then the file is ok.
+	err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
 
 	setup_and_count := time.Now()
 
-    if err == 0 { // don't try these tests if SGF Setup failed.
-        fmt.Printf("Setup and CountFilesAndMoves took %v to run.\n", setup_and_count.Sub(start))
-        
-        if doAllTests || doReadWriteDatabase {
-            stat := sgfdb.ReadAndWriteDatabase(DatabaseDir, TestOutDir, fileLimit, moveLimit, skipFiles)
-            if stat > 0 {
-                fmt.Printf("Errors during reading and writing database: %d\n", stat)
-            }
-            sgf.ReportSGFCounts()
-        }
-    }
+	if err == 0 { // don't try these tests if SGF Setup failed.
+		fmt.Printf("Setup and CountFilesAndMoves took %v to run.\n", setup_and_count.Sub(start))
+
+		if doAllTests || doReadWriteDatabase {
+			stat := sgfdb.ReadAndWriteDatabase(DatabaseDir, TestOutDir, fileLimit, moveLimit, skipFiles)
+			if stat > 0 {
+				fmt.Printf("Errors during reading and writing database: %d\n", stat)
+			}
+			sgf.ReportSGFCounts()
+		}
+	}
 
 	stop := time.Now()
 	fmt.Printf("All tests took %v to run.\n", stop.Sub(start))
 
-    if err == 0 { // don't try these tests if SGF Setup failed.
-        if doReadDatabaseAndBuild {
-            buildStat := sgfdb.ReadDatabaseAndBuildPatterns(DatabaseDir, BoardPatternsDir, ah.WHOLE_BOARD_PATTERN, fileLimit, moveLimit, skipFiles)
-            
-            if buildStat > 0 {
-                fmt.Printf("Errors during Build Patterns, status = %d.\n", buildStat)
-            }
-        }
-        
-        if doReadTeachingGames {
-            teachStat := sgfdb.ReadTeachingDirectory(TeachingDir, TeachingPatternsDir, fileLimit, moveLimit, patternLimit, skipFiles)
-            
-            if teachStat > 0 {
-                fmt.Printf("Errors while Reading TeachingDir, status = %d.\n", teachStat)
-            }
-        }
-        
-        if doReadWriteFuseki {
-            fusekiFile, err := ioutil.ReadFile(fusekiFileName)
-            if err != nil && err != io.EOF {
-                fmt.Printf("Error reading teaching Fuseki file: %s, %s\n", fusekiFileName, err)
-            } else {
-                prsr, errL := sgf.ParseFile(fusekiFileName, fusekiFile,
-                                            sgf.ParseComments+sgf.ParserGoGoD+sgf.ParserPlay, moveLimit)
-                if len(errL) != 0 {
-                    fmt.Printf("Error %s during parsing: %s\n", errL.Error(), fusekiFileName)
-                } else {
-                        //TODO: add error reporting? ErrorList return value?
-                    if (sgfProcessOptions & RemoveLabels) > 0 {
-                        fmt.Println("Removing labels from:", fusekiFileName, "to", outFusekiFileName)
-                        prsr.GameTree.BreadthFirstTraverse(true, sgf.DoRemoveLabels)
-                        prsr.GameTree.ReportDeletedProperties()
-                    }
-                    if (sgfProcessOptions & AddAllLabels) > 0 {
-                        fmt.Println("Adding labels to:", outFusekiFileName, "from", fusekiFileName)
-                        prsr.GameTree.DepthFirstTraverse(true, sgf.DoAddLabels)
-                        fmt.Println("The number of added labels =", sgf.NumberOfAddedLabels)
-                    }
-                    err = prsr.GameTree.WriteFile(outFusekiFileName, 1)
-                    if err != nil {
-                        fmt.Printf("Error writing: %s, %s\n", outFusekiFileName, err)
-                    } else {
-                            // Build ZCode mapping of unique board positions and transformations:
-                            // TODO: err = prsr.GameTree.BuildFusekiTable()
-                    }
-                }
-            }
-        }
-    
+	if err == 0 { // don't try these tests if SGF Setup failed.
+		if doReadDatabaseAndBuild {
+			buildStat := sgfdb.ReadDatabaseAndBuildPatterns(DatabaseDir, BoardPatternsDir, ah.WHOLE_BOARD_PATTERN, fileLimit, moveLimit, skipFiles)
+
+			if buildStat > 0 {
+				fmt.Printf("Errors during Build Patterns, status = %d.\n", buildStat)
+			}
+		}
+
+		if doReadTeachingGames {
+			teachStat := sgfdb.ReadTeachingDirectory(TeachingDir, TeachingPatternsDir, fileLimit, moveLimit, patternLimit, skipFiles)
+
+			if teachStat > 0 {
+				fmt.Printf("Errors while Reading TeachingDir, status = %d.\n", teachStat)
+			}
+		}
+
+		if doReadWriteFuseki {
+			fusekiFile, err := ioutil.ReadFile(fusekiFileName)
+			if err != nil && err != io.EOF {
+				fmt.Printf("Error reading teaching Fuseki file: %s, %s\n", fusekiFileName, err)
+			} else {
+				prsr, errL := sgf.ParseFile(fusekiFileName, fusekiFile,
+					sgf.ParseComments+sgf.ParserGoGoD+sgf.ParserPlay, moveLimit)
+				if len(errL) != 0 {
+					fmt.Printf("Error %s during parsing: %s\n", errL.Error(), fusekiFileName)
+				} else {
+					//TODO: add error reporting? ErrorList return value?
+					if (sgfProcessOptions & RemoveLabels) > 0 {
+						fmt.Println("Removing labels from:", fusekiFileName, "to", outFusekiFileName)
+						prsr.GameTree.BreadthFirstTraverse(true, sgf.DoRemoveLabels)
+						prsr.GameTree.ReportDeletedProperties()
+					}
+					if (sgfProcessOptions & AddAllLabels) > 0 {
+						fmt.Println("Adding labels to:", outFusekiFileName, "from", fusekiFileName)
+						prsr.GameTree.DepthFirstTraverse(true, sgf.DoAddLabels)
+						fmt.Println("The number of added labels =", sgf.NumberOfAddedLabels)
+					}
+					err = prsr.GameTree.WriteFile(outFusekiFileName, 1)
+					if err != nil {
+						fmt.Printf("Error writing: %s, %s\n", outFusekiFileName, err)
+					} else {
+						// Build ZCode mapping of unique board positions and transformations:
+						// TODO: err = prsr.GameTree.BuildFusekiTable()
+					}
+				}
+			}
+		}
+
 	}
 
 	finish := time.Now()
