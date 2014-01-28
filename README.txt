@@ -1,5 +1,5 @@
 File:       README.txt
-Project:    ahgo
+Project:    abst-hier
 
 Created by Ken Friedenbach on Sept. 2, 2012
 Updated for abst-hier workspace Jan. 1, 2014
@@ -10,15 +10,15 @@ For overall status and objectives, see:
 in the Projects directory.
 
 The source is divided into three directories:
-    ahgo/ah - abstraction hierarchy updating
-    ahgo/sgf - reading and writing .sgf files
+    /ah - abstraction hierarchy updating
+    /sgf - reading and writing .sgf files
         SGF properties are defined in: 
-            ahgo/sgf_properties_spec.txt
-    ahgo/sgfdb - read and write the GoGoD and other databases
+            /sgf/sgf_properties_spec.txt
+    /sgfdb - read and write the GoGoD and other databases
 These are built and installed as three packages.
 
 The test program is in:
-    ahgo/test_ahgo.go
+    /test_ahgo.go
     
 There is a script to build and run the tests:
     abst-hier/src/buildScript.bash

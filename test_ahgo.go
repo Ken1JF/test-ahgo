@@ -1,5 +1,5 @@
 /*
- *	File:       src/gitHub.com/Ken1JF/ahgo/test_ahgo.go
+ *	File:       src/github.com/Ken1JF/test_ahgo.go
  *	Project:	abst-hier
  *
  *	Created by Ken Friedenbach on 12/18/2009
@@ -32,9 +32,9 @@ import (
 	"strings"
 	"time"
 	"fmt"
-	"gitHub.com/Ken1JF/ahgo/ah"
-	"gitHub.com/Ken1JF/ahgo/sgf"
-	"gitHub.com/Ken1JF/ahgo/sgfdb"
+	"github.com/Ken1JF/ah"
+	"github.com/Ken1JF/sgf"
+	"github.com/Ken1JF/sgfdb"
 	"runtime"
 )
 
@@ -43,8 +43,7 @@ const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with 
 const DO_MULTI_CPU = true
 
 // SGF Specification file is copied from a different project: Projects/GenSGFProperties
-// const defaultSGFSpecFile = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
-const defaultSGFSpecFile = "src/gitHub.com/Ken1JF/ahgo/sgf_properties_spec.txt"
+const defaultSGFSpecFile = "src/github.com/Ken1JF/sgf/sgf_properties_spec.txt"
 
 var SGFSpecFile = defaultSGFSpecFile
 
@@ -95,11 +94,11 @@ const defaultTeachingPatternsDir = "/Users/ken/Documents/GO/Games/teaching/patte
 
 var TeachingPatternsDir = defaultTeachingPatternsDir
 
-const defaultFusekiFileName = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/Fuseki.sgf"
+const defaultFusekiFileName = "/Users/ken/Projects/abst-hier/src/github.com/Ken1JF/Fuseki.sgf"
 
 var fusekiFileName = defaultFusekiFileName
 
-const defaultOutFusekiFileName = "/Users/ken/Projects/abst-hier/src/gitHub.com/Ken1JF/ahgo/Fuseki2.sgf"
+const defaultOutFusekiFileName = "/Users/ken/Projects/abst-hier/src/github.com/Ken1JF/Fuseki2.sgf"
 
 var outFusekiFileName = defaultOutFusekiFileName
 
@@ -143,7 +142,7 @@ func ReadSmallSGFTests(dir string, outDir string) {
 				return
 			}
 			//			prsr , errL := sgf.ParseFile(fileName, b, sgf.ParseComments, 0)
-			prsr, errL := sgf.ParseFile(fileName, b, sgf.ParseComments+sgf.Play, 0)
+			prsr, errL := sgf.ParseFile(fileName, b, sgf.ParseComments+sgf.ParserPlay, 0)
 			if len(errL) != 0 {
 				fmt.Println("Error while parsing:", fileName, ", ", errL.Error())
 				return
@@ -160,131 +159,6 @@ func ReadSmallSGFTests(dir string, outDir string) {
 			}
 			ah.SetAHTrace(false)
 		}
-	}
-}
-
-// TODO: sort by second field (last name) if present
-func Gtr(a []byte, b []byte) bool {
-	idx := 0
-	for (idx < len(a)) && (idx < len(b)) {
-		if a[idx] > b[idx] {
-			return true
-		} else if a[idx] < b[idx] {
-			return false
-		}
-		idx += 1
-	}
-	if len(a) > len(b) {
-		return true
-	}
-	return false
-}
-
-func ReportSGFCounts() {
-	for i, c := range sgf.ID_Counts {
-		if c > 0 {
-			fmt.Printf("Property %s used %d times.\n", string(sgf.GetProperty(sgf.PropertyDefIdx(i)).ID), c)
-		}
-	}
-	if sgf.Unkn_Count > 0 {
-		fmt.Printf("Property ?Unkn? used %d times.\n", sgf.Unkn_Count)
-	}
-
-	// report the HA map
-	sum := 0
-	for s, n := range sgf.HA_map {
-		fmt.Printf("Handicap %s occurred %d times.\n", s, n)
-		sum += n
-	}
-	fmt.Printf("Total Handicap games %d with %d different handicaps\n", sum, len(sgf.HA_map))
-
-	// report the OH map
-	sum = 0
-	for s, n := range sgf.OH_map {
-		fmt.Printf("Old Handicap %s occurred %d times.\n", s, n)
-		sum += n
-	}
-	fmt.Printf("Total Old Handicap games %d with %d different settings\n", sum, len(sgf.OH_map))
-
-	// report the RE map
-	sum = 0
-	for s, n := range sgf.RE_map {
-		fmt.Printf("Result %s occurred %d times.\n", s, n)
-		sum += n
-	}
-	fmt.Printf("Total games with Results %d among %d different settings\n", sum, len(sgf.RE_map))
-
-	// report the RC (result comments)
-	sum = 0
-	for s, n := range sgf.RC_map {
-		fmt.Printf("Result comment %s occurred %d times.\n", s, n)
-		sum += n
-	}
-	fmt.Printf("Total Result comments %d with %d different comments\n", sum, len(sgf.RC_map))
-
-	// report the RU map
-	sum = 0
-	for s, n := range sgf.RU_map {
-		fmt.Printf("Rules %s occurred %d times.\n", s, n)
-		sum += n
-	}
-	fmt.Printf("Total games with Rules %d with %d different settings\n", sum, len(sgf.RU_map))
-
-	// report the BWRank map
-	sum = 0
-	for s, n := range sgf.BWRank_map {
-		fmt.Printf("Rank %s occurred %d times.\n", s, n)
-		sum += n
-	}
-	fmt.Printf("Total players with Ranks %d among %d different settings\n", sum, len(sgf.BWRank_map))
-
-	// report the BWPlayer map
-	//	sum = 0
-	//	for s, n := range sgf.BWPlayer_map {
-	//		fmt.Printf("Player %s occurred %d times, first %s, %s last %s, %s.\n", s, n.NGames, n.FirstGame, n.FirstRank, n.LastGame, n.LastRank)
-	//		sum += n.NGames
-	//	}
-	//	fmt.Printf("Total players %d with %d different names\n", sum, len(sgf.BWPlayer_map))
-
-	// sort the Player names, with counts:
-	nPlayers := len(sgf.BWPlayer_map)
-	var playerNames [][]byte
-	var playerCount []int
-	playerNames = make([][]byte, nPlayers)
-	playerCount = make([]int, nPlayers)
-	idx := 0
-	for s, n := range sgf.BWPlayer_map {
-		playerNames[idx] = make([]byte, len(s))
-		_ = copy(playerNames[idx], s)
-		playerCount[idx] = n.NGames
-		idx += 1
-	}
-	// Sort them alphabetically:
-	for ix := 0; ix < nPlayers; ix++ {
-		for iy := ix; iy < nPlayers; iy++ {
-			if Gtr(playerNames[ix], playerNames[iy]) {
-				playerNames[ix], playerNames[iy] = playerNames[iy], playerNames[ix]
-				playerCount[ix], playerCount[iy] = playerCount[iy], playerCount[ix]
-			}
-		}
-	}
-	for i, s := range playerNames {
-		n, _ := sgf.BWPlayer_map[string(s)]
-		fmt.Printf("Player %s: %d, first: %s, %s, last: %s, %s\n", s, playerCount[i], n.FirstGame, n.FirstRank, n.LastGame, n.LastRank)
-	}
-
-	// Sort them numerically:
-	for ix := 0; ix < nPlayers; ix++ {
-		for iy := ix; iy < nPlayers; iy++ {
-			if playerCount[ix] < playerCount[iy] {
-				playerNames[ix], playerNames[iy] = playerNames[iy], playerNames[ix]
-				playerCount[ix], playerCount[iy] = playerCount[iy], playerCount[ix]
-			}
-		}
-	}
-	for i, s := range playerCount {
-		n, _ := sgf.BWPlayer_map[string(playerNames[i])]
-		fmt.Printf(" %d : %s, first:  %s, %s, last: %s, %s\n", s, playerNames[i], n.FirstGame, n.FirstRank, n.LastGame, n.LastRank)
 	}
 }
 
@@ -423,7 +297,7 @@ func main() {
             if stat > 0 {
                 fmt.Printf("Errors during reading and writing database: %d\n", stat)
             }
-            ReportSGFCounts()
+            sgf.ReportSGFCounts()
         }
     }
 
@@ -453,7 +327,7 @@ func main() {
                 fmt.Printf("Error reading teaching Fuseki file: %s, %s\n", fusekiFileName, err)
             } else {
                 prsr, errL := sgf.ParseFile(fusekiFileName, fusekiFile,
-                                            sgf.ParseComments+sgf.GoGoD+sgf.Play, moveLimit)
+                                            sgf.ParseComments+sgf.ParserGoGoD+sgf.ParserPlay, moveLimit)
                 if len(errL) != 0 {
                     fmt.Printf("Error %s during parsing: %s\n", errL.Error(), fusekiFileName)
                 } else {
