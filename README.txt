@@ -22,7 +22,7 @@ The test program is in:
     
 There is a script to build and run the tests:
     abst-hier/src/buildScript.bash
-        TODO: add to a repo. Which one? ahgo?
+        TODO: add to a repo. Which one? test-ahgo?
     
 Some major tests:
     rwd, do read write database

@@ -20,14 +20,14 @@ echo "cleaning"
 go clean github.com/Ken1JF/ah
 go clean github.com/Ken1JF/sgf
 go clean github.com/Ken1JF/sgfdb
-echo "testig for test_ahgo to remove"
+echo "looking for bin/test_ahgo to remove"
 if [[ -e bin/test_ahgo ]] ; then echo "remove bin/test_ahgo" ; rm bin/test_ahgo ; fi
 
 echo "veting"
 go tool vet src/github.com/Ken1JF/ah
 go tool vet src/github.com/Ken1JF/sgf
 go tool vet src/github.com/Ken1JF/sgfdb
-go tool vet src/github.com/Ken1JF/ahgo/test_ahgo.go
+go tool vet src/github.com/Ken1JF/test-ahgo/test_ahgo.go
 
 echo "installing"
 go install github.com/Ken1JF/ah
@@ -45,9 +45,10 @@ go test -cover github.com/Ken1JF/sgf
 go test -cover github.com/Ken1JF/sgfdb
 
 echo "testing combined coverage together"
-go test -cover github.com/Ken1JF/ah -coverprofile ah.cover.out
-go test -cover github.com/Ken1JF/sgf -coverpkg github.com/Ken1JF/ah,github.com/Ken1JF/sgf -coverprofile sgf.cover.out
-go test -cover github.com/Ken1JF/sgfdb -coverpkg github.com/Ken1JF/ah,github.com/Ken1JF/sgf,github.com/Ken1JF/sgfdb -coverprofile sgfdb.cover.out
+if [[ -e test/ ]] ; then echo "test/ exists" ; else echo "making test/" ; mkdir test ; fi
+go test -cover github.com/Ken1JF/ah -coverprofile test/ahCover.out
+go test -cover github.com/Ken1JF/sgf -coverpkg github.com/Ken1JF/ah,github.com/Ken1JF/sgf -coverprofile test/sgfCover.out
+go test -cover github.com/Ken1JF/sgfdb -coverpkg github.com/Ken1JF/ah,github.com/Ken1JF/sgf,github.com/Ken1JF/sgfdb -coverprofile test/sgfdbCover.out
 
 #-coverprofile cover.out
 
@@ -58,12 +59,12 @@ echo "formatting"
 go fmt github.com/Ken1JF/ah
 go fmt github.com/Ken1JF/sgf
 go fmt github.com/Ken1JF/sgfdb
-go fmt github.com/Ken1JF/ahgo
+go fmt github.com/Ken1JF/test-ahgo
 
 echo "building test_ahgo"
-go build -o bin/test_ahgo src/github.com/Ken1JF/ahgo/test_ahgo.go
+go build -o bin/test_ahgo src/github.com/Ken1JF/test-ahgo/test_ahgo.go
 
 echo "running test_ahgo"
-test_ahgo -at=true -al=true -offn="src/github.com/Ken1JF/ahgo/Fuseki3.sgf" -ffn="src/github.com/Ken1JF/ahgo/Fuseki2.sgf"  -rwf=true >& test_ahgo_new.txt -fl=10 -ml=10 -ssf="src/github.com/Ken1JF/sgf/sgf_properties_spec.txt"
+test_ahgo -at=true -al=true -offn="src/github.com/Ken1JF/ahgo/Fuseki3.sgf" -ffn="src/github.com/Ken1JF/test-ahgo/Fuseki2.sgf"  -rwf=true >& test_ahgo_new.txt -fl=10 -ml=10 -ssf="src/github.com/Ken1JF/sgf/sgf_properties_spec.txt"
 diff test_ahgo_new.txt test_ahgo_out.txt
 
