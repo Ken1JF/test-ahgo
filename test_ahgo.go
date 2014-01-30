@@ -74,13 +74,9 @@ var SmallSGFTestOutDir = defaultSmallSGFTestOutDir
 // Test Controls:
 
 // SGF Database and testout dirs:
-const defaultDatabaseDir = "/Users/ken/Documents/GO/GoGoD/Go/Database/"
+const defaultDatabaseDir = "/usr/local/GoGoD/Go/Database/"
 
 var DatabaseDir = defaultDatabaseDir
-
-const defaultTestOutDir = "/Users/ken/Documents/GO/GoGoD/testout/"
-
-var TestOutDir = defaultTestOutDir
 
 const defaultBoardPatternsDir = "/Users/ken/Projects/OpenLikeAPro/Library/Board/"
 
@@ -170,7 +166,6 @@ func init() {
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
 	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
-	flag.BoolVar(&doReadWriteDatabase, "rwd", false, "rwd = do Read and Write Database, false (default) means do not read and write database.")
 	flag.BoolVar(&doReadDatabaseAndBuild, "rdab", false, "rdab = do Read Database And Build patterns, false (default) means do not do Read Database And Build patterns.")
 	flag.BoolVar(&doReadTeachingGames, "rtg", false, "rtg = do Read Teaching Games, false (default) means do not do read teaching games.")
 	flag.BoolVar(&doReadWriteFuseki, "rwf", false, "rwf = do Read Write Fuseki, false (default) means do not read and write Fuseki file.")
@@ -181,7 +176,6 @@ func init() {
 	flag.StringVar(&SmallSGFTestDir, "sstdir", defaultSmallSGFTestDir, "path to the Small SGF test directory.")
 	flag.StringVar(&SmallSGFTestOutDir, "sstodir", defaultSmallSGFTestOutDir, "path to the Small SGF Tests output directory.")
 	flag.StringVar(&DatabaseDir, "dbdir", defaultDatabaseDir, "path to the Database directory.")
-	flag.StringVar(&TestOutDir, "todir", defaultTestOutDir, "path to the test output directory.")
 	flag.StringVar(&BoardPatternsDir, "bpdir", defaultBoardPatternsDir, "path to the Board Patterns directory.")
 	flag.StringVar(&TeachingDir, "tdir", defaultTeachingDir, "path to teaching games directory.")
 	flag.StringVar(&TeachingPatternsDir, "tpdir", defaultTeachingPatternsDir, "path to the teaching patterns directory.")
@@ -228,9 +222,6 @@ func PrintOptionsSet() {
 	if doReadTeachingGames {
 		fmt.Printf("rtg, do read teaching games has value %t\n", doReadTeachingGames)
 	}
-	if doReadWriteDatabase {
-		fmt.Printf("rwd, do read write database has value %t\n", doReadWriteDatabase)
-	}
 	if doReadWriteFuseki {
 		fmt.Printf("rwf, do read write Fuseki file has value %t\n", doReadWriteFuseki)
 	}
@@ -248,9 +239,6 @@ func PrintOptionsSet() {
 	}
 	if TeachingDir != defaultTeachingDir {
 		fmt.Printf("tdir, teaching directory has value \"%s\"\n", TeachingDir)
-	}
-	if TestOutDir != defaultTestOutDir {
-		fmt.Printf("todir, test output directory has value \"%s\"\n", TestOutDir)
 	}
 	if TeachingPatternsDir != defaultTeachingPatternsDir {
 		fmt.Printf("tpdir, teaching patterns directory has value \"%s\"\n", TeachingPatternsDir)
@@ -292,13 +280,6 @@ func main() {
 	if err == 0 { // don't try these tests if SGF Setup failed.
 		fmt.Printf("Setup and CountFilesAndMoves took %v to run.\n", setup_and_count.Sub(start))
 
-		if doAllTests || doReadWriteDatabase {
-			stat := sgfdb.ReadAndWriteDatabase(DatabaseDir, TestOutDir, fileLimit, moveLimit, skipFiles)
-			if stat > 0 {
-				fmt.Printf("Errors during reading and writing database: %d\n", stat)
-			}
-			sgf.ReportSGFCounts()
-		}
 	}
 
 	stop := time.Now()
