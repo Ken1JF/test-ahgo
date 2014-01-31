@@ -3,11 +3,27 @@ Project:    abst-hier
 
 Created by Ken Friedenbach on Sept. 2, 2012
 Updated for abst-hier workspace Jan. 1, 2014
+Last updated Jan 31, 3014
 
-This project is a re-engineering of AHGoGo.
+This project is a re-engineering of AHGoGo,
+a C++ project.
+
 For overall status and objectives, see:
     TODO: add document ...
 in the Projects directory.
+
+The $GOPATH should be set to:
+    abst-hier/
+which has subdirectories
+    src/
+    bin/
+    pkg/
+    test/
+and so on.
+
+From here, the path to the sources,
+following Go recommendations is:
+    src/github.com/Ken1JF
 
 The source is divided into three directories:
     /ah - abstraction hierarchy updating
@@ -17,19 +33,25 @@ The source is divided into three directories:
     /sgfdb - read and write the GoGoD and other databases
 These are built and installed as three packages.
 
-The test program is in:
-    /test_ahgo.go
-    
+There are now test files in each package, which use
+the Go test technology. They can be used to verify
+functionality, as well as getting cover analysis.
+
+The old test program is in:
+    /test-ahgo/test_ahgo.go
+It is gradually having test functionality removed,
+until only code under development will remain: the building
+of pattern files.
+
 There is a script to build and run the tests:
-    abst-hier/src/buildScript.bash
-        TODO: add to a repo. Which one? test-ahgo?
+    test-ahgo/buildScript.bash
     
 Some major tests:
-    rwd, do read write database
+    read write database
         after this test, run "./checkout.txt" in
             TODO: add to abst-hier
             TODO: get a golden output, then stop using
-
+            
 Working on:
     Processing: Fuseki.sgf - a file of Fuseki openings.
         Based on the book: Fuseki Small Encyclopedia Vol. 2 with 3 Pro games transformed to normalize the first move, so it is in the Left-Upper Octant.
@@ -50,7 +72,6 @@ Working on:
         Fuseki3 has order A -> H
         Fuseki2 has order cc, dc, ec, cd, dd, cp, dp, cq, i.e. col-row, sorted by row, then col.
 TODO:
-    Fix so Fuseki3.sgf is correct. (file or movelimit breaking?)
     read the GoGoD databases, record frequency and results.
     construct other databases for handicaps
     split records based on Komi and Rules.
