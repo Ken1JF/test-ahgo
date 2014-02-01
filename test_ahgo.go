@@ -34,7 +34,7 @@ import (
 	"io"
 	"io/ioutil"
 	"runtime"
-	"strings"
+	//	"strings"
 	"time"
 )
 
@@ -50,26 +50,10 @@ var SGFSpecFile = defaultSGFSpecFile
 // Some test and print controls.
 // default values are controlled by init()
 // final values are set by program arguments
-var doAllTests bool
 
-var doReadWriteDatabase bool
 var doReadDatabaseAndBuild bool
 var doReadTeachingGames bool
 var doReadWriteFuseki bool
-
-// count should be 56 with all tests included.
-// One test currently in "WorkOnLater"
-const SmallSGFTestOutputVerified int = 54  // controls the printing of last graph
-const SmallSGFTestStringsVerified int = 55 // controls tracing
-
-const defaultSmallSGFTestDir = "/Users/ken/Documents/GO/Tests/sgf_tests/"
-
-var SmallSGFTestDir = defaultSmallSGFTestDir
-
-// Set to empty string to suppress writing output:
-const defaultSmallSGFTestOutDir = "/Users/ken/Documents/GO/Tests/sgf_tests/goTestOut/"
-
-var SmallSGFTestOutDir = defaultSmallSGFTestOutDir
 
 // Test Controls:
 
@@ -115,49 +99,6 @@ var sgfProcessOptions ProcessOptions = 0
 var removeLabels = false
 var allLabels = false
 
-func ReadSmallSGFTests(dir string, outDir string) {
-	fmt.Println("Reading Small SGF Tests, dir =", dir, ", outDir =", outDir)
-	dirFiles, err := ioutil.ReadDir(dir)
-	if err != nil && err != io.EOF {
-		fmt.Println("Can't read test directory:", dir)
-		return
-	}
-	count := 0
-	for _, f := range dirFiles {
-		if strings.Index(f.Name(), ".sgf") >= 0 {
-			count += 1
-			fmt.Println("Processing:", f.Name())
-			if count > SmallSGFTestStringsVerified {
-				ah.SetAHTrace(true)
-				fmt.Println("Tracing", f.Name())
-			}
-			fileName := dir + f.Name()
-			b, err := ioutil.ReadFile(fileName)
-			if err != nil && err != io.EOF {
-				fmt.Println("Error reading file:", fileName, err)
-				return
-			}
-			//			prsr , errL := sgf.ParseFile(fileName, b, sgf.ParseComments, 0)
-			prsr, errL := sgf.ParseFile(fileName, b, sgf.ParseComments+sgf.ParserPlay, 0)
-			if len(errL) != 0 {
-				fmt.Println("Error while parsing:", fileName, ", ", errL.Error())
-				return
-			}
-			if outDir != "" {
-				outFileName := outDir + "/" + f.Name()
-				err = prsr.GameTree.WriteFile(outFileName, sgfdb.SGFDB_NUM_PER_LINE)
-				if err != nil {
-					fmt.Printf("Error writing: %s, %s\n", outFileName, err)
-				}
-			}
-			if count > SmallSGFTestOutputVerified {
-				prsr.PrintAbstHier(fileName, true)
-			}
-			ah.SetAHTrace(false)
-		}
-	}
-}
-
 func init() {
 
 	flag.IntVar(&moveLimit, "ml", 0, "ml = move limit. limit the number of moves read each .sgf file, 0 means no limit")
@@ -165,7 +106,6 @@ func init() {
 	flag.IntVar(&patternLimit, "pl", 0, "pl = pattern limit. limit the depth of pattern storing, 0 means no limit")
 	flag.IntVar(&skipFiles, "sf", 0, "sf = skip files. skip this number of .sgf files before reading from a directory, 0 means no skip")
 
-	flag.BoolVar(&doAllTests, "at", false, "at = all tests. do all tests, false (default) means not to do all tests, but can still do individual tests.")
 	flag.BoolVar(&doReadDatabaseAndBuild, "rdab", false, "rdab = do Read Database And Build patterns, false (default) means do not do Read Database And Build patterns.")
 	flag.BoolVar(&doReadTeachingGames, "rtg", false, "rtg = do Read Teaching Games, false (default) means do not do read teaching games.")
 	flag.BoolVar(&doReadWriteFuseki, "rwf", false, "rwf = do Read Write Fuseki, false (default) means do not read and write Fuseki file.")
@@ -173,8 +113,6 @@ func init() {
 	flag.BoolVar(&allLabels, "al", false, "al = all labels, false (default) means do generate all labels in Fuseki file.")
 
 	flag.StringVar(&SGFSpecFile, "ssf", defaultSGFSpecFile, "path to the SGF properties specification file.")
-	flag.StringVar(&SmallSGFTestDir, "sstdir", defaultSmallSGFTestDir, "path to the Small SGF test directory.")
-	flag.StringVar(&SmallSGFTestOutDir, "sstodir", defaultSmallSGFTestOutDir, "path to the Small SGF Tests output directory.")
 	flag.StringVar(&DatabaseDir, "dbdir", defaultDatabaseDir, "path to the Database directory.")
 	flag.StringVar(&BoardPatternsDir, "bpdir", defaultBoardPatternsDir, "path to the Board Patterns directory.")
 	flag.StringVar(&TeachingDir, "tdir", defaultTeachingDir, "path to teaching games directory.")
@@ -188,9 +126,6 @@ func PrintOptionsSet() {
 	// Print changes to the options:
 	if allLabels {
 		fmt.Printf("al, all labels has value %v\n", allLabels)
-	}
-	if doAllTests {
-		fmt.Printf("at, all test has value %t\n", doAllTests)
 	}
 	if BoardPatternsDir != defaultBoardPatternsDir {
 		fmt.Printf("bpdir, board patterns directory has value \"%s\"\n", BoardPatternsDir)
@@ -230,12 +165,6 @@ func PrintOptionsSet() {
 	}
 	if SGFSpecFile != defaultSGFSpecFile {
 		fmt.Printf("ssf, SGF specification file has value \"%s\"\n", SGFSpecFile)
-	}
-	if SmallSGFTestDir != defaultSmallSGFTestDir {
-		fmt.Printf("sstdir, small SGF test directory has value \"%s\"\n", SmallSGFTestDir)
-	}
-	if SmallSGFTestOutDir != defaultSmallSGFTestOutDir {
-		fmt.Printf("sstodir, small SGF test output directory has value \"%s\"\n", SmallSGFTestOutDir)
 	}
 	if TeachingDir != defaultTeachingDir {
 		fmt.Printf("tdir, teaching directory has value \"%s\"\n", TeachingDir)

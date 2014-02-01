@@ -65,6 +65,6 @@ echo "building test_ahgo"
 go build -o bin/test_ahgo src/github.com/Ken1JF/test-ahgo/test_ahgo.go
 
 echo "running test_ahgo"
-test_ahgo -at=true -al=true -offn="src/github.com/Ken1JF/test-ahgo/Fuseki3.sgf" -ffn="src/github.com/Ken1JF/test-ahgo/Fuseki2.sgf" -rwf=true >& test_ahgo_new.txt -ssf="src/github.com/Ken1JF/sgf/sgf_properties_spec.txt"
+test_ahgo -al=true -offn="src/github.com/Ken1JF/test-ahgo/Fuseki3.sgf" -ffn="src/github.com/Ken1JF/test-ahgo/Fuseki2.sgf" -rwf=true >& test_ahgo_new.txt -ssf="src/github.com/Ken1JF/sgf/sgf_properties_spec.txt"
 diff test_ahgo_new.txt test_ahgo_out.txt
 
