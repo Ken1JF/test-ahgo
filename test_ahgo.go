@@ -40,8 +40,6 @@ import (
 
 const SGF_GEN_GO_VERSION = "1.0 (update AbstHier working, one level. Built with Go version 1.2 Generate whole board patterns...)"
 
-const DO_MULTI_CPU = true
-
 // SGF Specification file is copied from a different project: Projects/GenSGFProperties
 const defaultSGFSpecFile = "src/github.com/Ken1JF/sgf/sgf_properties_spec.txt"
 
@@ -177,7 +175,7 @@ func PrintOptionsSet() {
 func main() {
 	fmt.Printf("Program to generate opening pattern libraries:\n Version %s\n", SGF_GEN_GO_VERSION)
 	nCPUs := runtime.NumCPU()
-	if DO_MULTI_CPU {
+	if sgfdb.TheDBReadReq.DoMultiCPU {
 		oldMaxProcs := runtime.GOMAXPROCS(nCPUs)
 		fmt.Printf(" num CPUs = %d, default max Procs was %d, now set to num CPUs\n\n", nCPUs, oldMaxProcs)
 	} else {
@@ -203,13 +201,6 @@ func main() {
 	// or ask for verbose output. These are done in sgf_test.go
 	// If that test is ok, then the file is ok.
 	err := sgf.SetupSGFProperties(SGFSpecFile, false, false)
-
-	setup_and_count := time.Now()
-
-	if err == 0 { // don't try these tests if SGF Setup failed.
-		fmt.Printf("Setup and CountFilesAndMoves took %v to run.\n", setup_and_count.Sub(start))
-
-	}
 
 	stop := time.Now()
 	fmt.Printf("All tests took %v to run.\n", stop.Sub(start))

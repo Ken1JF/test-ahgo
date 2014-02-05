@@ -6,6 +6,8 @@
 #  Created by Ken Friedenbach on 7/17/12.
 #  Copyright 2012-2014. All rights reserved.
 
+date
+
 cd ../../../../
 pwd
 
@@ -39,6 +41,8 @@ go test github.com/Ken1JF/ah
 go test github.com/Ken1JF/sgf
 go test github.com/Ken1JF/sgfdb
 
+#echo "NOT running coverage during development"
+# Do coverage after development is complete
 echo "testing individual package test coverage"
 go test -cover github.com/Ken1JF/ah
 go test -cover github.com/Ken1JF/sgf
@@ -67,4 +71,6 @@ go build -o bin/test_ahgo src/github.com/Ken1JF/test-ahgo/test_ahgo.go
 echo "running test_ahgo"
 test_ahgo -al=true -offn="src/github.com/Ken1JF/test-ahgo/Fuseki3.sgf" -ffn="src/github.com/Ken1JF/test-ahgo/Fuseki2.sgf" -rwf=true >& test_ahgo_new.txt -ssf="src/github.com/Ken1JF/sgf/sgf_properties_spec.txt"
 diff test_ahgo_new.txt test_ahgo_out.txt
+
+date
 
