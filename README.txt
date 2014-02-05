@@ -53,6 +53,9 @@ Some major tests:
             TODO: get a golden output, then stop using
             
 Working on:
+    Parameterizing the ProcessDatabase and ProcessDirectory functions
+        to be used by ReadAndWriteDatabase, CountFilesAndMoves, and
+        other functions that enumerate a data base.
     Processing: Fuseki.sgf - a file of Fuseki openings.
         Based on the book: Fuseki Small Encyclopedia Vol. 2 with 3 Pro games transformed to normalize the first move, so it is in the Left-Upper Octant.
         Note: 99 InteriorNodes are caused by 99 C[...] comments.
